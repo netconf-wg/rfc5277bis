@@ -1,15 +1,15 @@
 
    *** PRE-DRAFT - INTERNAL DISCUSSIONS ONLY ***             
 
-
-NETCONF                                                         A. Clemm
-Internet-Draft                                                    Huawei
-Intended status: Standards Track                                 E. Voit
-Expires: August 12, 2017                              A. Gonzalez Prieto
+NETCONF                                                          E. Voit
+Internet-Draft                                             Cisco Systems
+Intended status: Standards Track                                A. Clemm
+Expires: August 13, 2017                                          Huawei
+                                                      A. Gonzalez Prieto
                                                        E. Nilsen-Nygaard
                                                              A. Tripathy
                                                            Cisco Systems
-                                                        February 8, 2017
+                                                        February 9, 2017
 
 
                    Subscribing to Event Notifications
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 12, 2017.
+   This Internet-Draft will expire on August 13, 2017.
 
 Copyright Notice
 
@@ -49,15 +49,15 @@ Copyright Notice
 
    This document is subject to BCP 78 and the IETF Trust's Legal
    Provisions Relating to IETF Documents
-   (http://trustee.ietf.org/license-info) in effect on the date of
 
 
 
-Clemm, et al.            Expires August 12, 2017                [Page 1]
+Voit, et al.             Expires August 13, 2017                [Page 1]
 
 Internet-Draft             Event Notifications             February 2017
 
 
+   (http://trustee.ietf.org/license-info) in effect on the date of
    publication of this document.  Please review these documents
    carefully, as they describe your rights and restrictions with respect
    to this document.  Code Components extracted from this document must
@@ -105,16 +105,15 @@ Table of Contents
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  42
      12.2.  Informative References . . . . . . . . . . . . . . . . .  43
    Appendix A.  Backwards Compatibility  . . . . . . . . . . . . . .  44
-   Appendix B.  Issues that are currently being worked and resolved   44
 
 
 
-Clemm, et al.            Expires August 12, 2017                [Page 2]
+Voit, et al.             Expires August 13, 2017                [Page 2]
 
 Internet-Draft             Event Notifications             February 2017
 
 
-     B.1.  Unresolved and yet-to-be addressed issues . . . . . . . .  45
+   Appendix B.  Issues that are currently being worked and resolved   44
    Appendix C.  Changes between revisions  . . . . . . . . . . . . .  45
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  46
 
@@ -129,11 +128,10 @@ Internet-Draft             Event Notifications             February 2017
 
    Notification delivery can occur over a variety of protocols used
    commonly in conjunction with YANG, such as NETCONF [RFC6241] (defined
-   in [I-D.ietf-netconf-netconf-event-notif]) and Restconf
-   [I-D.ietf-netconf-restconf] (defined in
-   [I-D.ietf-netconf-restconf-notif]).  The capabilities and operations
-   defined in this document are intended to obsolete RFC 5277, along
-   with their mapping onto NETCONF transport.
+   in [I-D.ietf-netconf-netconf-event-notif]) and Restconf [RFC8040]
+   (defined in [I-D.ietf-netconf-restconf-notif]).  The capabilities and
+   operations defined in this document are intended to obsolete RFC
+   5277, along with their mapping onto NETCONF transport.
 
 1.1.  Motivation
 
@@ -162,15 +160,14 @@ Internet-Draft             Event Notifications             February 2017
 
    o  Mechanism to communicate the notifications.
 
+   o  Ability to replay locally logged notifications.
 
 
 
-Clemm, et al.            Expires August 12, 2017                [Page 3]
+Voit, et al.             Expires August 13, 2017                [Page 3]
 
 Internet-Draft             Event Notifications             February 2017
 
-
-   o  Ability to replay locally logged notifications.
 
 1.2.  Terminology
 
@@ -221,7 +218,9 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017                [Page 4]
+
+
+Voit, et al.             Expires August 13, 2017                [Page 4]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -277,7 +276,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017                [Page 5]
+Voit, et al.             Expires August 13, 2017                [Page 5]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -333,7 +332,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017                [Page 6]
+Voit, et al.             Expires August 13, 2017                [Page 6]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -389,7 +388,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017                [Page 7]
+Voit, et al.             Expires August 13, 2017                [Page 7]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -445,7 +444,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017                [Page 8]
+Voit, et al.             Expires August 13, 2017                [Page 8]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -501,7 +500,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017                [Page 9]
+Voit, et al.             Expires August 13, 2017                [Page 9]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -557,7 +556,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 10]
+Voit, et al.             Expires August 13, 2017               [Page 10]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -613,7 +612,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 11]
+Voit, et al.             Expires August 13, 2017               [Page 11]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -669,7 +668,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 12]
+Voit, et al.             Expires August 13, 2017               [Page 12]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -725,7 +724,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 13]
+Voit, et al.             Expires August 13, 2017               [Page 13]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -781,7 +780,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 14]
+Voit, et al.             Expires August 13, 2017               [Page 14]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -837,7 +836,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 15]
+Voit, et al.             Expires August 13, 2017               [Page 15]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -893,7 +892,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 16]
+Voit, et al.             Expires August 13, 2017               [Page 16]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -949,7 +948,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 17]
+Voit, et al.             Expires August 13, 2017               [Page 17]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1005,7 +1004,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 18]
+Voit, et al.             Expires August 13, 2017               [Page 18]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1061,7 +1060,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 19]
+Voit, et al.             Expires August 13, 2017               [Page 19]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1117,7 +1116,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 20]
+Voit, et al.             Expires August 13, 2017               [Page 20]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1173,7 +1172,7 @@ module ietf-subscribed-notifications {
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 21]
+Voit, et al.             Expires August 13, 2017               [Page 21]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1229,7 +1228,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 22]
+Voit, et al.             Expires August 13, 2017               [Page 22]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1285,7 +1284,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 23]
+Voit, et al.             Expires August 13, 2017               [Page 23]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1341,7 +1340,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 24]
+Voit, et al.             Expires August 13, 2017               [Page 24]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1397,7 +1396,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 25]
+Voit, et al.             Expires August 13, 2017               [Page 25]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1453,7 +1452,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 26]
+Voit, et al.             Expires August 13, 2017               [Page 26]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1509,7 +1508,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 27]
+Voit, et al.             Expires August 13, 2017               [Page 27]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1565,7 +1564,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 28]
+Voit, et al.             Expires August 13, 2017               [Page 28]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1621,7 +1620,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 29]
+Voit, et al.             Expires August 13, 2017               [Page 29]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1677,7 +1676,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 30]
+Voit, et al.             Expires August 13, 2017               [Page 30]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1733,7 +1732,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 31]
+Voit, et al.             Expires August 13, 2017               [Page 31]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1789,7 +1788,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 32]
+Voit, et al.             Expires August 13, 2017               [Page 32]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1845,7 +1844,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 33]
+Voit, et al.             Expires August 13, 2017               [Page 33]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1901,7 +1900,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 34]
+Voit, et al.             Expires August 13, 2017               [Page 34]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -1957,7 +1956,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 35]
+Voit, et al.             Expires August 13, 2017               [Page 35]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -2013,7 +2012,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 36]
+Voit, et al.             Expires August 13, 2017               [Page 36]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -2069,7 +2068,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 37]
+Voit, et al.             Expires August 13, 2017               [Page 37]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -2125,7 +2124,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 38]
+Voit, et al.             Expires August 13, 2017               [Page 38]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -2181,7 +2180,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 39]
+Voit, et al.             Expires August 13, 2017               [Page 39]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -2237,7 +2236,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 40]
+Voit, et al.             Expires August 13, 2017               [Page 40]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -2293,7 +2292,7 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 41]
+Voit, et al.             Expires August 13, 2017               [Page 41]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -2349,14 +2348,10 @@ Internet-Draft             Event Notifications             February 2017
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 42]
+Voit, et al.             Expires August 13, 2017               [Page 42]
 
 Internet-Draft             Event Notifications             February 2017
 
-
-   [RFC5277]  Chisholm, S. and H. Trevino, "NETCONF Event
-              Notifications", RFC 5277, DOI 10.17487/RFC5277, July 2008,
-              <http://www.rfc-editor.org/info/rfc5277>.
 
    [RFC6241]  Enns, R., Ed., Bjorklund, M., Ed., Schoenwaelder, J., Ed.,
               and A. Bierman, Ed., "Network Configuration Protocol
@@ -2368,8 +2363,9 @@ Internet-Draft             Event Notifications             February 2017
               DOI 10.17487/RFC6536, March 2012,
               <http://www.rfc-editor.org/info/rfc6536>.
 
-   [RFC7950]  Bjorklund, M., "The YANG 1.1 Data Modeling Language",
-              RFC 7950, August 2016.
+   [RFC7950]  Bjorklund, M., Ed., "The YANG 1.1 Data Modeling Language",
+              RFC 7950, DOI 10.17487/RFC7950, August 2016,
+              <http://www.rfc-editor.org/info/rfc7950>.
 
 12.2.  Informative References
 
@@ -2379,11 +2375,6 @@ Internet-Draft             Event Notifications             February 2017
               Trevino, "NETCONF support for event notifications", August
               2016, <https://datatracker.ietf.org/doc/draft-ietf-
               netconf-netconf-event-notifications/>.
-
-   [I-D.ietf-netconf-restconf]
-              Bierman, A., Bjorklund, M., and K. Watsen, "RESTCONF
-              Protocol", I-D draft-ietf-netconf-restconf-17, September
-              2016.
 
    [I-D.ietf-netconf-restconf-notif]
               Voit, Eric., Clemm, Alexander., Tripathy, A., Nilsen-
@@ -2395,17 +2386,25 @@ Internet-Draft             Event Notifications             February 2017
    [I-D.ietf-netconf-yang-push]
               Clemm, Alexander., Voit, Eric., Gonzalez Prieto, Alberto.,
               Tripathy, A., and E. Nilsen-Nygaard, "Subscribing to YANG
-              datastore push updates", June 2016,
+              datastore push updates", February 2017,
               <https://datatracker.ietf.org/doc/draft-ietf-netconf-yang-
               push/>.
 
+   [RFC5277]  Chisholm, S. and H. Trevino, "NETCONF Event
+              Notifications", RFC 5277, DOI 10.17487/RFC5277, July 2008,
+              <http://www.rfc-editor.org/info/rfc5277>.
+
+   [RFC8040]  Bierman, A., Bjorklund, M., and K. Watsen, "RESTCONF
+              Protocol", RFC 8040, DOI 10.17487/RFC8040, January 2017,
+              <http://www.rfc-editor.org/info/rfc8040>.
 
 
 
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 43]
+
+Voit, et al.             Expires August 13, 2017               [Page 43]
 
 Internet-Draft             Event Notifications             February 2017
 
@@ -2455,27 +2454,18 @@ Appendix B.  Issues that are currently being worked and resolved
 
    (To be removed by RFC editor prior to publication)
 
+   Issue #9: validate that Subscription ID will only be relevant locally
+   to a single receiver
 
 
 
 
-
-
-Clemm, et al.            Expires August 12, 2017               [Page 44]
+Voit, et al.             Expires August 13, 2017               [Page 44]
 
 Internet-Draft             Event Notifications             February 2017
 
 
-B.1.  Unresolved and yet-to-be addressed issues
-
-   Error type scrubbing
-
-   Data plane notifications and layered headers
-
-   Mechanisms for diagnostics, e.g. deal with dropped updates,
-   monitoring when they occur, etc
-
-   Filters and streams completed
+   Issue #6: Data plane notifications and layered headers
 
    How to allow for seamless integration with non-standard encodings and
    transports (like GPB/GRPC).  Specify requirements encoding and
@@ -2489,9 +2479,11 @@ Appendix C.  Changes between revisions
 
    o  Kill subscription RPC added.
 
-   o  Error conditions added, and made specific in return codes.
+   o  Renamed from 5277bis to Subscribed Notifications.
 
    o  Extracted create-subscription and other elements of RFC5277.
+
+   o  Error conditions added, and made specific in return codes.
 
    o  Simplified yang model structure for removal of 'basic' grouping.
 
@@ -2515,16 +2507,19 @@ Appendix C.  Changes between revisions
 
    o  In yang model: 'info' changed to 'policy'
 
-
-
-Clemm, et al.            Expires August 12, 2017               [Page 45]
-
-Internet-Draft             Event Notifications             February 2017
-
-
    o  Scattered text clarifications
 
    v00 - v01
+
+
+
+
+
+
+Voit, et al.             Expires August 13, 2017               [Page 45]
+
+Internet-Draft             Event Notifications             February 2017
+
 
    o  YANG Model changes.  New groupings for subscription info to allow
       restriction of what is changable via RPC.  Removed notifications
@@ -2540,16 +2535,16 @@ Internet-Draft             Event Notifications             February 2017
 
 Authors' Addresses
 
-   Alexander Clemm
-   Huawei
-
-   Email: ludwig@clemm.org
-
-
    Eric Voit
    Cisco Systems
 
    Email: evoit@cisco.com
+
+
+   Alexander Clemm
+   Huawei
+
+   Email: ludwig@clemm.org
 
 
    Alberto Gonzalez Prieto
@@ -2573,4 +2568,8 @@ Authors' Addresses
 
 
 
-Clemm, et al.            Expires August 12, 2017               [Page 46]
+
+
+
+
+Voit, et al.             Expires August 13, 2017               [Page 46]
