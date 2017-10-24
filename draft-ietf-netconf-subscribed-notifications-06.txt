@@ -70,20 +70,21 @@ Table of Contents
      1.1.  Motivation  . . . . . . . . . . . . . . . . . . . . . . .   3
      1.2.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   4
      1.3.  Solution Overview . . . . . . . . . . . . . . . . . . . .   5
+     1.4.  Relationship to RFC-5277  . . . . . . . . . . . . . . . .   6
    2.  Solution  . . . . . . . . . . . . . . . . . . . . . . . . . .   6
      2.1.  Event Streams . . . . . . . . . . . . . . . . . . . . . .   6
-     2.2.  Event Stream Filters  . . . . . . . . . . . . . . . . . .   6
+     2.2.  Event Stream Filters  . . . . . . . . . . . . . . . . . .   7
      2.3.  Subscription State Model at the Publisher . . . . . . . .   7
-   3.  Data Model Trees  . . . . . . . . . . . . . . . . . . . . . .   8
-   4.  Dynamic Subscriptions . . . . . . . . . . . . . . . . . . . .  13
-     4.1.  Establishing a Subscription . . . . . . . . . . . . . . .  13
-     4.2.  Modifying a Subscription  . . . . . . . . . . . . . . . .  15
-     4.3.  Deleting a Subscription . . . . . . . . . . . . . . . . .  15
-     4.4.  Killing a Subscription  . . . . . . . . . . . . . . . . .  15
-   5.  Configured Subscriptions  . . . . . . . . . . . . . . . . . .  16
+   3.  Data Model Trees  . . . . . . . . . . . . . . . . . . . . . .   9
+   4.  Dynamic Subscriptions . . . . . . . . . . . . . . . . . . . .  14
+     4.1.  Establishing a Subscription . . . . . . . . . . . . . . .  14
+     4.2.  Modifying a Subscription  . . . . . . . . . . . . . . . .  16
+     4.3.  Deleting a Subscription . . . . . . . . . . . . . . . . .  16
+     4.4.  Killing a Subscription  . . . . . . . . . . . . . . . . .  16
+   5.  Configured Subscriptions  . . . . . . . . . . . . . . . . . .  17
      5.1.  Creating a Configured Subscription  . . . . . . . . . . .  17
      5.2.  Modifying a Configured Subscription . . . . . . . . . . .  19
-     5.3.  Deleting a Configured Subscription  . . . . . . . . . . .  19
+     5.3.  Deleting a Configured Subscription  . . . . . . . . . . .  20
    6.  Deleting a Configured Subscription  . . . . . . . . . . . . .  20
    7.  Asynchronous Subscribed Event Delivery  . . . . . . . . . . .  20
    8.  Subscription State Notifications  . . . . . . . . . . . . . .  21
@@ -103,7 +104,6 @@ Table of Contents
      11.1.  Implementation Considerations  . . . . . . . . . . . . .  46
      11.2.  Security Considerations  . . . . . . . . . . . . . . . .  46
    12. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  47
-   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  48
 
 
 
@@ -112,10 +112,10 @@ Voit, et al.             Expires April 26, 2018                 [Page 2]
 Internet-Draft          Subscribed Notifications            October 2017
 
 
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  48
      13.1.  Normative References . . . . . . . . . . . . . . . . . .  48
      13.2.  Informative References . . . . . . . . . . . . . . . . .  48
-   Appendix A.  Relationship to RFC-5277 . . . . . . . . . . . . . .  49
-   Appendix B.  Changes between revisions  . . . . . . . . . . . . .  50
+   Appendix A.  Changes between revisions  . . . . . . . . . . . . .  49
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  52
 
 1.  Introduction
@@ -287,6 +287,32 @@ Internet-Draft          Subscribed Notifications            October 2017
    out of resources to serve the subscription, or by internal errors on
    the publisher.
 
+1.4.  Relationship to RFC-5277
+
+   This document is intended to provide a superset of the subscription
+   capabilities initially defined within [RFC5277].  Especially when
+   extending an existing [RFC5277] implementation, it is important to
+   understand what has been reused and what has been replaced.  Key
+   realtionships between these two documents include:
+
+   o  the data model in this document replaces the data model in
+      [RFC5277].
+
+   o  the RPC operations in this draft replaces the symetrical
+      operations of [RFC5277], section 4.
+
+   o  the one way operation of [RFC5277] is still used.  However this
+      operation will no longer be required with the availability of
+      [I.D.draft-ietf-netconf-notification-messages].
+
+   o  the definition and contents of the NETCONF stream are identical
+      between this document and [RFC5277].
+
+   o  a publisher MAY implement both the data model and RPCs defined in
+      [RFC5277] and this new document concurrently, in order to support
+      old clients.  However the use of both alternatives on a single
+      transport session is prohibited.
+
 2.  Solution
 
 2.1.  Event Streams
@@ -301,6 +327,15 @@ Internet-Draft          Subscribed Notifications            October 2017
    NETCONF.  The NETCONF event stream contains all NETCONF XML event
    record information supported by the publisher, except for where it
    has been explicitly indicated that this the event record MUST be
+
+
+
+
+Voit, et al.             Expires April 26, 2018                 [Page 6]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
+
    excluded from the NETCONF stream.  Beyond NETCONF, implementations
    are free to add additional event streams.
 
@@ -327,15 +362,6 @@ Internet-Draft          Subscribed Notifications            October 2017
    If no event stream filter is provided, all event records on a stream
    are to be sent.
 
-
-
-
-
-Voit, et al.             Expires April 26, 2018                 [Page 6]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
 2.3.  Subscription State Model at the Publisher
 
    Below is the state machine of a subscription for the publisher for a
@@ -344,6 +370,27 @@ Internet-Draft          Subscribed Notifications            October 2017
    made active.  The mere request by a subscriber to establish a
    subscription is insufficient for that asserted subscription to be
    externally visible via this state machine.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Voit, et al.             Expires April 26, 2018                 [Page 7]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
 
                        .-------.
                        | start |
@@ -384,18 +431,22 @@ Internet-Draft          Subscribed Notifications            October 2017
 
    As shown below, a very similar state machine exists for configured
    subscriptions.  Creation, modification, and deletion is via
-
-
-
-Voit, et al.             Expires April 26, 2018                 [Page 7]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
    configuration operations rather than via RPC.  The status of each
    receiver (active or suspended) is managed by the publisher, and is
    non-configurable.  Individual receivers are provided no information
    about other receivers from the publisher.
+
+
+
+
+
+
+
+
+Voit, et al.             Expires April 26, 2018                 [Page 8]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
 
                      .-------.
                      | start |
@@ -440,19 +491,19 @@ module: ietf-subscribed-notifications
     |     +--ro replay-log-aged-time?       yang:date-and-time {replay}?
     +--rw filters
     |  +--rw event-stream-filter* [identifier]
-
-
-
-Voit, et al.             Expires April 26, 2018                 [Page 8]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
     |     +--rw identifier        filter-id
     |     +--rw (filter-spec)?
     |        +--:(subtree-filter)
     |        |  +--rw subtree-filter?    {encode-xml}?
     |        +--:(xpath-filter)
+
+
+
+Voit, et al.             Expires April 26, 2018                 [Page 9]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
+
     |           +--rw xpath-filter?     yang:xpath1.0
     +--rw subscription-config {configured-subscriptions}?
     |  +--rw subscription* [identifier]
@@ -496,19 +547,19 @@ Internet-Draft          Subscribed Notifications            October 2017
           |     |  +--:(by-reference)
           |     |  |  +--ro event-stream-filter-ref
           |     |  |                            event-stream-filter-ref
-
-
-
-Voit, et al.             Expires April 26, 2018                 [Page 9]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
           |     |  +--:(within-subscription)
           |     |     +--ro (filter-spec)?
           |     |        +--:(subtree-filter)
           |     |        |  +--ro subtree-filter?          {encode-xml}?
           |     |        +--:(xpath-filter)
+
+
+
+Voit, et al.             Expires April 26, 2018                [Page 10]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
+
           |     |           +--ro xpath-filter?            yang:xpath1.0
           |     +--ro stream                     stream
           |     +--ro replay-start-time?   yang:date-and-time {replay}?
@@ -552,19 +603,19 @@ Internet-Draft          Subscribed Notifications            October 2017
     |     +--ro (result)?
     |        +--:(no-success)
     |        |  +--ro filter-failure?           string
-
-
-
-Voit, et al.             Expires April 26, 2018                [Page 10]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
     |        |  +--ro replay-start-time-hint?   yang:date-and-time
     |        +--:(success)
     |           +--ro identifier                subscription-id
     +---x modify-subscription
     |  +---w input
+
+
+
+Voit, et al.             Expires April 26, 2018                [Page 11]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
+
     |  |  +---w identifier?                subscription-id
     |  |  +---w (target)
     |  |  |  +--:(stream)
@@ -608,19 +659,19 @@ Internet-Draft          Subscribed Notifications            October 2017
     |  |     +--ro (event-stream-filter)?
     |  |     |  +--:(by-reference)
     |  |     |  |  +--ro event-stream-filter-ref
-
-
-
-Voit, et al.             Expires April 26, 2018                [Page 11]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
     |  |     |  |                                event-stream-filter-ref
     |  |     |  +--:(within-subscription)
     |  |     |     +--ro (filter-spec)?
     |  |     |        +--:(subtree-filter)
     |  |     |        |  +--ro subtree-filter?             {encode-xml}?
+
+
+
+Voit, et al.             Expires April 26, 2018                [Page 12]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
+
     |  |     |        +--:(xpath-filter)
     |  |     |           +--ro xpath-filter?              yang:xpath1.0
     |  |     +--ro stream                     stream
@@ -664,18 +715,19 @@ Internet-Draft          Subscribed Notifications            October 2017
       existing filter definition as an alternative to defining a filter
       inline for each subscription.
 
-
-
-
-Voit, et al.             Expires April 26, 2018                [Page 12]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
    o  "Subscription-config" contains the configuration of configured
       subscriptions.  The parameters of each configured subscription are
       a superset of the parameters of a dynamic subscription and use the
       same groupings.  In addition, the configured subscriptions MUST
+
+
+
+
+Voit, et al.             Expires April 26, 2018                [Page 13]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
+
       also specify intended receivers and MAY specify the push source
       from which to send the stream of notification messages.
 
@@ -720,17 +772,18 @@ Internet-Draft          Subscribed Notifications            October 2017
 
    If the publisher cannot satisfy the "establish-subscription" request,
    it sends a negative "subscription-result" element.  If the subscriber
+   has no authorization to establish the subscription, the
+   "subscription-result" indicates an authorization error.  Optionally,
+   the "subscription-result" MAY include one or more hints on
 
 
 
-Voit, et al.             Expires April 26, 2018                [Page 13]
+
+Voit, et al.             Expires April 26, 2018                [Page 14]
 
 Internet-Draft          Subscribed Notifications            October 2017
 
 
-   has no authorization to establish the subscription, the
-   "subscription-result" indicates an authorization error.  Optionally,
-   the "subscription-result" MAY include one or more hints on
    alternative input parameters and value which would have resulted in
    an accepted subscription.
 
@@ -776,16 +829,16 @@ Internet-Draft          Subscribed Notifications            October 2017
    request.  Subscribers MAY do a get on "replay-log-creation-time" and
    "replay-log-aged-time" to assess the availability of replay.  The
    actual size of the replay log at any given time is a publisher
+   specific matter.  Control parameters for this aspect of the feature
+   are outside the scope of this document.
 
 
 
-Voit, et al.             Expires April 26, 2018                [Page 14]
+
+Voit, et al.             Expires April 26, 2018                [Page 15]
 
 Internet-Draft          Subscribed Notifications            October 2017
 
-
-   specific matter.  Control parameters for this aspect of the feature
-   are outside the scope of this document.
 
 4.2.  Modifying a Subscription
 
@@ -831,19 +884,17 @@ Internet-Draft          Subscribed Notifications            October 2017
    identifiers which may be used with "kill-subscription" by searching
    for the ip address of a receiver within the yang tree.
 
-
-
-
-
-Voit, et al.             Expires April 26, 2018                [Page 15]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
    Configured subscriptions cannot be killed using this RPC.  Instead,
    configured subscriptions are deleted as part of regular configuration
    operations.  Publishers MUST reject any RPC attempt to kill a
    configured subscription.
+
+
+
+Voit, et al.             Expires April 26, 2018                [Page 16]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
 
 5.  Configured Subscriptions
 
@@ -885,17 +936,6 @@ Internet-Draft          Subscribed Notifications            October 2017
       is provided, notification messages MUST egress the publisher's
       default interface towards that receiver.
 
-
-
-
-
-
-
-Voit, et al.             Expires April 26, 2018                [Page 16]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
 5.1.  Creating a Configured Subscription
 
    Configured subscriptions are established using configuration
@@ -904,6 +944,14 @@ Internet-Draft          Subscribed Notifications            October 2017
    subscription creation.  Firstly, configuration operations install a
    subscription without question, while RPCs are designed to the support
    negotiation and rejection of requests.  Secondly, while RPCs mandate
+
+
+
+Voit, et al.             Expires April 26, 2018                [Page 17]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
+
    that the subscriber establishing the subscription is the only
    receiver of the notification messages, configuration operations
    permit specifying receivers independent of any tracked subscriber.
@@ -926,31 +974,6 @@ Internet-Draft          Subscribed Notifications            October 2017
 
    As an example at subscription creation using configuration operations
    over NETCONF, a client might send:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Voit, et al.             Expires April 26, 2018                [Page 17]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
 
       <rpc message-id="101"
              xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
@@ -978,6 +1001,13 @@ Internet-Draft          Subscribed Notifications            October 2017
 
           Figure 3: Configured subscription creation via NETCONF
 
+
+
+Voit, et al.             Expires April 26, 2018                [Page 18]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
+
    if the request is accepted, the publisher would reply:
 
       <rpc-reply message-id="101"
@@ -989,24 +1019,6 @@ Internet-Draft          Subscribed Notifications            October 2017
 
    if the request is not accepted because the publisher cannot serve it,
    the publisher may reply:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Voit, et al.             Expires April 26, 2018                [Page 18]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
 
       <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
           <rpc-error>
@@ -1044,18 +1056,6 @@ Internet-Draft          Subscribed Notifications            October 2017
    receiver) or removed (i.e., subscription-terminated to a specific
    receiver.)
 
-5.3.  Deleting a Configured Subscription
-
-   Subscriptions can be deleted using configuration operations against
-   the top-level subtree subscription-config.  For example, in RESTCONF:
-
-
-
-
-
-
-
-
 
 
 
@@ -1063,6 +1063,11 @@ Voit, et al.             Expires April 26, 2018                [Page 19]
 
 Internet-Draft          Subscribed Notifications            October 2017
 
+
+5.3.  Deleting a Configured Subscription
+
+   Subscriptions can be deleted using configuration operations against
+   the top-level subtree subscription-config.  For example, in RESTCONF:
 
    DELETE /subscription-config/subscription=1922 HTTP/1.1
    Host: example.com
@@ -1104,11 +1109,6 @@ Internet-Draft          Subscribed Notifications            October 2017
    This notification message MUST be encoded as one-way notification
    element of [RFC5277], Section 4.  The following example within
    [RFC7950] section 7.16.3 is an example of a compliant message:
-
-
-
-
-
 
 
 
@@ -2529,7 +2529,9 @@ Internet-Draft          Subscribed Notifications            October 2017
    way it is unlikely there will be collisions if the configured
    subscriptions attempt to set a subscription-id which might have
    already been dynamically allocated.  The lower half SHOULD be used
-   for configured subscriptions and upper half for dynamic.
+   for subscriptions which will have subscription identifiers provided
+   from outside the publisher, and upper half for subscription
+   identifiers assigned by the publisher.
 
    No state change notification or nor subscribed event records within
    notification messages may be sent before the transport layer,
@@ -2566,8 +2568,6 @@ Internet-Draft          Subscribed Notifications            October 2017
    configured subscription based on capacity constraints.  When this
    occurs, the subscription status MUST be updated accordingly and the
    receivers notified with subscription state notifications.
-
-
 
 
 
@@ -2616,9 +2616,9 @@ Internet-Draft          Subscribed Notifications            October 2017
 12.  Acknowledgments
 
    For their valuable comments, discussions, and feedback, we wish to
-   acknowledge Andy Bierman, Tim Jenkins, Martin Bjorklund, Balazs
-   Lengyel, Sharon Chisholm, Hector Trevino, Susan Hares, Kent Watsen,
-   Michael Scharf, and Guangying Zheng.
+   acknowledge Andy Bierman, Tim Jenkins, Martin Bjorklund, Kent Watsen,
+   Balazs Lengyel, Robert Wilton, Sharon Chisholm, Hector Trevino, Susan
+   Hares, Michael Scharf, and Guangying Zheng.
 
 
 
@@ -2712,39 +2712,7 @@ Internet-Draft          Subscribed Notifications            October 2017
               Protocol", RFC 8040, DOI 10.17487/RFC8040, January 2017,
               <https://www.rfc-editor.org/info/rfc8040>.
 
-Appendix A.  Relationship to RFC-5277
-
-   There are a number of relationships of this document to [RFC5277]:
-
-   o  the data model in this draft replaces the data model in [RFC5277].
-
-   o  the RPC operations in this draft replaces the symetrical
-      operations of [RFC5277], section 4.
-
-   o  the one way operation of [RFC5277] is still used.  However this
-      operation will no longer be required with the availability of
-      [I.D.draft-ietf-netconf-notification-messages].
-
-   o  the definition and contents of the NETCONF stream are identical
-      between this document and [RFC5277].
-
-   o  a publisher MAY implement both the data model and RPCs defined in
-      [RFC5277] and this new document concurrently, in order to support
-      old clients.  However the use of both alternatives on a single
-      transport session is prohibited.
-
-
-
-
-
-
-
-Voit, et al.             Expires April 26, 2018                [Page 49]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
-Appendix B.  Changes between revisions
+Appendix A.  Changes between revisions
 
    (To be removed by RFC editor prior to publication)
 
@@ -2752,7 +2720,7 @@ Appendix B.  Changes between revisions
 
    o  Made changes proposed by Martin, Kent, and others on the list.
       Most significant of these are Stream returned to string (with the
-      SYSLOG identity removed), appendix on 5277 relationship, an
+      SYSLOG identity removed), intro section on 5277 relationship, an
       identity set moved to an enumeration, clean up of definitions/
       terminology.
 
@@ -2768,6 +2736,13 @@ Appendix B.  Changes between revisions
    o  stream object changed to 'name' from 'stream'
 
    o  Cleaned up examples
+
+
+
+Voit, et al.             Expires April 26, 2018                [Page 49]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
 
    o  Clarified that JSON support needs notification-messages draft.
 
@@ -2793,13 +2768,6 @@ Appendix B.  Changes between revisions
 
    v01 - v02
 
-
-
-Voit, et al.             Expires April 26, 2018                [Page 50]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
    o  Subscription status moved under receiver.
 
    v00 - v01
@@ -2823,6 +2791,14 @@ Internet-Draft          Subscribed Notifications            October 2017
    o  Enabled notification timestamp to have different formats.
 
    o  Two error codes added.
+
+
+
+
+Voit, et al.             Expires April 26, 2018                [Page 50]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
 
    v01 5277bis - v00 subscribed notifications
 
@@ -2849,13 +2825,6 @@ Internet-Draft          Subscribed Notifications            October 2017
    o  Control plane notification renamed to subscription state
       notification
 
-
-
-Voit, et al.             Expires April 26, 2018                [Page 51]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
    o  Source address: Source-vrf changed to string, default address
       option added
 
@@ -2876,6 +2845,16 @@ Internet-Draft          Subscribed Notifications            October 2017
    o  Removal of redundancy with other drafts
 
    o  Many other clean-ups of wording and terminology
+
+
+
+
+
+
+Voit, et al.             Expires April 26, 2018                [Page 51]
+
+Internet-Draft          Subscribed Notifications            October 2017
+
 
 Authors' Addresses
 
@@ -2903,15 +2882,6 @@ Authors' Addresses
    Email: einarnn@cisco.com
 
 
-
-
-
-
-Voit, et al.             Expires April 26, 2018                [Page 52]
-
-Internet-Draft          Subscribed Notifications            October 2017
-
-
    Ambika Prasad Tripathy
    Cisco Systems
 
@@ -2937,30 +2907,4 @@ Internet-Draft          Subscribed Notifications            October 2017
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Voit, et al.             Expires April 26, 2018                [Page 53]
+Voit, et al.             Expires April 26, 2018                [Page 52]
