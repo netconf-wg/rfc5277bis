@@ -2754,10 +2754,9 @@ Internet-Draft          Subscribed Notifications              March 2018
             config false;
             description
               "Operational data which provides the number of event
-               records from a stream explicitly removed via a stream
-               filter so that they are not sent to a receiver.  This
-               count does not include event records filtered from a
-               stream as a result of access control filtering.";
+               records from a stream explicitly removed either via a
+               stream filter or an access control filter so that they
+               are not passed to a receiver.";
             }
           leaf state {
             type enumeration {
@@ -2797,6 +2796,7 @@ Internet-Draft          Subscribed Notifications              March 2018
             mandatory true;
             description
               "Specifies the state of a subscription from the
+              perspective of a particular receiver.  With this info it
 
 
 
@@ -2805,7 +2805,6 @@ Voit, et al.           Expires September 15, 2018              [Page 50]
 Internet-Draft          Subscribed Notifications              March 2018
 
 
-              perspective of a particular receiver.  With this info it
               is possible to determine whether a subscriber is currently
               generating notification messages intended for that
               receiver.";
@@ -2814,7 +2813,7 @@ Internet-Draft          Subscribed Notifications              March 2018
             description
               "Allows the reset of this configured subscription receiver
               to the 'connecting' state. This enables the
-              connection process to be reinitiated.";
+              connection process to be re-initiated.";
             output {
               leaf time {
                 type yang:date-and-time;
@@ -2853,6 +2852,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
    An implementation may choose to transition between active and
    suspended subscription states more frequently than required by this
+   specification.  However if a subscription is unable to marshal all
 
 
 
@@ -2861,7 +2861,6 @@ Voit, et al.           Expires September 15, 2018              [Page 51]
 Internet-Draft          Subscribed Notifications              March 2018
 
 
-   specification.  However if a subscription is unable to marshal all
    intended updates into a transmittable message in multiple successive
    intervals, the subscription SHOULD be suspended with the reason
    "unsupportable-volume".
@@ -2908,6 +2907,7 @@ Internet-Draft          Subscribed Notifications              March 2018
    configured subscription based on capacity constraints.  When this
    occurs, the subscription state MUST be updated accordingly and the
    receivers notified with subscription state notifications.
+
 
 
 
@@ -3093,7 +3093,7 @@ Appendix A.  Changes between revisions
 
    o  Access control filtering of events in streams included to match
       RFC5277 behavior
-	  
+
    o  Minor updates based on LC reviews
 
    v09 - v10
@@ -3133,9 +3133,6 @@ Appendix A.  Changes between revisions
    o  Made changes proposed by Martin, Kent, and others on the list.
       Most significant of these are Stream returned to string (with the
       SYSLOG identity removed), intro section on 5277 relationship, an
-      identity set moved to an enumeration, clean up of definitions/
-      terminology, state machine proposed for configured subscriptions
-      with a clean-up of subscription state options.
 
 
 
@@ -3143,6 +3140,10 @@ Voit, et al.           Expires September 15, 2018              [Page 56]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
+
+      identity set moved to an enumeration, clean up of definitions/
+      terminology, state machine proposed for configured subscriptions
+      with a clean-up of subscription state options.
 
    o  JSON and XML become features.  Also Xpath and subtree filtering
       become features
@@ -3189,16 +3190,16 @@ Internet-Draft          Subscribed Notifications              March 2018
 
    o  Subscription status moved under receiver.
 
-   v00 - v01
-
-   o  Security considerations updated
-
 
 
 Voit, et al.           Expires September 15, 2018              [Page 57]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
+
+   v00 - v01
+
+   o  Security considerations updated
 
    o  Intro rewrite, as well as scattered text changes
 
@@ -3243,10 +3244,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    o  Control plane notification renamed to subscription state
       notification
 
-   o  Source address: Source-vrf changed to string, default address
-      option added
-
-   o  In yang model: 'info' changed to 'policy'
 
 
 
@@ -3255,6 +3252,11 @@ Voit, et al.           Expires September 15, 2018              [Page 58]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
+
+   o  Source address: Source-vrf changed to string, default address
+      option added
+
+   o  In yang model: 'info' changed to 'policy'
 
    o  Scattered text clarifications
 
@@ -3298,6 +3300,15 @@ Authors' Addresses
    Email: einarnn@cisco.com
 
 
+
+
+
+
+Voit, et al.           Expires September 15, 2018              [Page 59]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
    Ambika Prasad Tripathy
    Cisco Systems
 
@@ -3307,4 +3318,46 @@ Authors' Addresses
 
 
 
-Voit, et al.           Expires September 15, 2018              [Page 59]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Voit, et al.           Expires September 15, 2018              [Page 60]
