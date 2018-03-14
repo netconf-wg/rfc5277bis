@@ -1,29 +1,33 @@
 PRE-DRAFT:  March 12 2018
 *************************
 
+
+
+
+
 NETCONF                                                          E. Voit
 Internet-Draft                                             Cisco Systems
 Intended status: Standards Track                                A. Clemm
-Expires: September 13, 2018                                       Huawei
+Expires: September 15, 2018                                       Huawei
                                                       A. Gonzalez Prieto
                                                                   VMWare
                                                        E. Nilsen-Nygaard
                                                              A. Tripathy
                                                            Cisco Systems
-                                                          March 12, 2018
+                                                          March 14, 2018
 
 
                   Custom Subscription to Event Streams
-             draft-ietf-netconf-subscribed-notifications-10
+             draft-ietf-netconf-subscribed-notifications-11
 
 Abstract
 
-   This document defines capabilities and operations for the customized
-   establishment of subscriptions upon a publisher's event streams.
-   Also defined are delivery mechanisms for instances of the resulting
-   notification messages.  Effectively this allows a subscriber to
-   request and receive a continuous, custom feed of publisher generated
-   information.
+   This document defines capabilities, operations, and a YANG Data Model
+   for the customized establishment of subscriptions upon a publisher's
+   event streams.  Also defined are delivery mechanisms for instances of
+   the resulting notification messages.  Effectively this allows a
+   subscriber to request and receive a continuous, custom feed of
+   publisher generated information.
 
 Status of This Memo
 
@@ -40,7 +44,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on September 13, 2018.
+   This Internet-Draft will expire on September 15, 2018.
 
 Copyright Notice
 
@@ -52,7 +56,7 @@ Copyright Notice
 
 
 
-Voit, et al.           Expires September 13, 2018               [Page 1]
+Voit, et al.           Expires September 15, 2018               [Page 1]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -92,7 +96,7 @@ Table of Contents
      5.2.  IANA Considerations . . . . . . . . . . . . . . . . . . .  52
      5.3.  Security Considerations . . . . . . . . . . . . . . . . .  52
    6.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  53
-   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  53
+   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  54
      7.1.  Normative References  . . . . . . . . . . . . . . . . . .  54
      7.2.  Informative References  . . . . . . . . . . . . . . . . .  55
    Appendix A.  Changes between revisions  . . . . . . . . . . . . .  56
@@ -103,18 +107,18 @@ Table of Contents
    This document defines capabilities and operations for the customized
    establishment of subscriptions upon system generated event streams.
    Effectively this enables a "subscribe then publish" capability where
-   the customized information needs of each target receiver are
-   understood by the publisher before subscribed event records are
+   the customized information needs and access permissions of each
+   target receiver are understood by the publisher before subscribed
 
 
 
-Voit, et al.           Expires September 13, 2018               [Page 2]
+Voit, et al.           Expires September 15, 2018               [Page 2]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
 
-   marshaled and pushed.  The receiver then gets a continuous, custom
-   feed of publisher generated information.
+   event records are marshaled and pushed.  The receiver then gets a
+   continuous, custom feed of publisher generated information.
 
    While the functionality defined in this document is transport-
    agnostic, protocols like NETCONF [RFC6241] or RESTCONF [RFC8040] can
@@ -140,8 +144,8 @@ Internet-Draft          Subscribed Notifications              March 2018
    o  negotiation of subscription parameters (through the use of hints
       returned as part of declined subscription requests)
 
-   o  state change notifications (e.g., publisher driven suspension,
-      parameter modification)
+   o  subscription state change notifications (e.g., publisher driven
+      suspension, parameter modification)
 
    o  independence from transport protocol
 
@@ -155,7 +159,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
    Configured subscription: A subscription installed via a configuration
    interface.  Typically a configured subscription is placed into a
-   configuration subsystem supporting persistence across reboots.
+   configuration subsystem which supports persistence across reboots.
 
    Dynamic subscription: A subscription agreed between subscriber and
    publisher created via an establish-subscription RPC.
@@ -164,7 +168,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018               [Page 3]
+Voit, et al.           Expires September 15, 2018               [Page 3]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -220,7 +224,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018               [Page 4]
+Voit, et al.           Expires September 15, 2018               [Page 4]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -276,7 +280,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018               [Page 5]
+Voit, et al.           Expires September 15, 2018               [Page 5]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -332,7 +336,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018               [Page 6]
+Voit, et al.           Expires September 15, 2018               [Page 6]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -343,12 +347,17 @@ Internet-Draft          Subscribed Notifications              March 2018
    and (2) subscription filtering does not exclude the event record from
    that receiver.
 
-   If access control permissions are in use to secure publisher content,
-   then for event records to be sent to a receiver, that receiver MUST
-   be allowed access to all the event records on the stream.  If
-   subscriber permissions change during the lifecycle of a subscription
-   and stream access is no longer permitted, then the subscription MUST
-   be terminated.
+   Access control permissions may be used to silently exclude event
+   records from within a stream for which the subscriber has no read
+   access.  As an example of how this might be accomplished, see
+   [RFC6536bis] section 3.4.6.  Note that per Section 2.7, subscription
+   state change notifications are never filtered out.
+
+   If no access control permissions are in place for stream content,
+   then a receiver MUST be allowed access to all the event records on
+   the stream.  If subscriber permissions change during the lifecycle of
+   a subscription and stream access is no longer permitted, then the
+   subscription MUST be terminated.
 
 2.2.  Event Stream Filters
 
@@ -381,17 +390,17 @@ Internet-Draft          Subscribed Notifications              March 2018
    A subscription's weighting MUST work identically to stream dependency
    weighting as described within RFC 7540, section 5.3.2.
 
+
+
+Voit, et al.           Expires September 15, 2018               [Page 7]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
    A subscription's dependency MUST work identically to stream
    dependency as described within [RFC7540], sections 5.3.1, 5.3.3, and
    5.3.4.  If a dependency is attempted via an RPC, but the referenced
    subscription does not exist, the dependency will be silently removed.
-
-
-
-Voit, et al.           Expires September 13, 2018               [Page 7]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
 
 2.4.  Dynamic Subscriptions
 
@@ -403,13 +412,14 @@ Internet-Draft          Subscribed Notifications              March 2018
 2.4.1.  Dynamic Subscription State Model
 
    Below is the publisher's state machine for a dynamic subscription.
-   It is important to note that such a subscription doesn't exist at the
-   publisher until an "establish-subscription" RPC is accepted.  The
-   mere request by a subscriber to establish a subscription is
-   insufficient for that asserted subscription to be externally visible.
-   States that are reflected in the YANG model appear in upper-case
-   letters; in addition, start and end states are depicted to reflect
-   subscription creation and deletion events.
+   Each state is shown in its own box.  It is important to note that
+   such a subscription doesn't exist at the publisher until an
+   "establish-subscription" RPC is accepted.  The mere request by a
+   subscriber to establish a subscription is insufficient for that
+   asserted subscription to be externally visible.  States that are
+   reflected in the YANG model appear in upper-case letters; in
+   addition, start and end states are depicted to reflect subscription
+   creation and deletion events.
 
                        .........
                        : start :
@@ -436,18 +446,15 @@ Internet-Draft          Subscribed Notifications              March 2018
 
    Of interest in this state machine are the following:
 
-   o  Successful "establish-subscription" or "modify-subscription" RPCs
-      put the subscription into an active state.
 
 
-
-
-
-
-Voit, et al.           Expires September 13, 2018               [Page 8]
+Voit, et al.           Expires September 15, 2018               [Page 8]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
+
+   o  Successful "establish-subscription" or "modify-subscription" RPCs
+      put the subscription into an active state.
 
    o  Failed "modify-subscription" RPCs will leave the subscription in
       its previous state, with no visible change to any streaming
@@ -497,10 +504,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-
-
-
-Voit, et al.           Expires September 13, 2018               [Page 9]
+Voit, et al.           Expires September 15, 2018               [Page 9]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -556,7 +560,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 10]
+Voit, et al.           Expires September 15, 2018              [Page 10]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -612,7 +616,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 11]
+Voit, et al.           Expires September 15, 2018              [Page 11]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -668,7 +672,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 12]
+Voit, et al.           Expires September 15, 2018              [Page 12]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -679,8 +683,9 @@ Internet-Draft          Subscribed Notifications              March 2018
    subscription previously established on that transport session.  If
    the publisher accepts the request, and the publisher has indicated
    success, the publisher MUST NOT send any more notification messages
-   for this subscription.  If the publisher rejects the request, the
-   request has no impact whatsoever on any subscription.
+   for this subscription.  If the delete request does not match a known
+   subscription established on the same transport session, then it MUST
+   be rejected with no changes to the publisher.
 
        +---x delete-subscription
           +---w input
@@ -723,8 +728,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-
-Voit, et al.           Expires September 13, 2018              [Page 13]
+Voit, et al.           Expires September 15, 2018              [Page 13]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -780,7 +784,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 14]
+Voit, et al.           Expires September 15, 2018              [Page 14]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -836,7 +840,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 15]
+Voit, et al.           Expires September 15, 2018              [Page 15]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -892,7 +896,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 16]
+Voit, et al.           Expires September 15, 2018              [Page 16]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -948,7 +952,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 17]
+Voit, et al.           Expires September 15, 2018              [Page 17]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1004,7 +1008,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 18]
+Voit, et al.           Expires September 15, 2018              [Page 18]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1060,7 +1064,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 19]
+Voit, et al.           Expires September 15, 2018              [Page 19]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1116,7 +1120,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 20]
+Voit, et al.           Expires September 15, 2018              [Page 20]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1172,7 +1176,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 21]
+Voit, et al.           Expires September 15, 2018              [Page 21]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1228,7 +1232,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 22]
+Voit, et al.           Expires September 15, 2018              [Page 22]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1284,7 +1288,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 23]
+Voit, et al.           Expires September 15, 2018              [Page 23]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1340,7 +1344,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 24]
+Voit, et al.           Expires September 15, 2018              [Page 24]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1396,7 +1400,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 25]
+Voit, et al.           Expires September 15, 2018              [Page 25]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1446,13 +1450,13 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 4.  Data Model
 
-<CODE BEGINS> file "ietf-subscribed-notifications@2018-03-12.yang"
+<CODE BEGINS> file "ietf-subscribed-notifications@2018-03-14.yang"
 module ietf-subscribed-notifications {
   yang-version 1.1;
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 26]
+Voit, et al.           Expires September 15, 2018              [Page 26]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1502,19 +1506,19 @@ Internet-Draft          Subscribed Notifications              March 2018
     "Contains a YANG specification for subscribing to event records
     and receiving matching content within notification messages.";
 
-  revision 2018-03-12 {
+  revision 2018-03-14 {
     description
       "Initial version";
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 27]
+Voit, et al.           Expires September 15, 2018              [Page 27]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
 
     reference
-      "RFC XXXX: Custom Subscription to Event Streams";
+      "RFC XXXX - Custom Subscription to Event Streams";
   }
 
   /*
@@ -1564,7 +1568,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 28]
+Voit, et al.           Expires September 15, 2018              [Page 28]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1620,7 +1624,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 29]
+Voit, et al.           Expires September 15, 2018              [Page 29]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1676,7 +1680,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 30]
+Voit, et al.           Expires September 15, 2018              [Page 30]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1732,7 +1736,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 31]
+Voit, et al.           Expires September 15, 2018              [Page 31]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1788,7 +1792,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 32]
+Voit, et al.           Expires September 15, 2018              [Page 32]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1844,7 +1848,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 33]
+Voit, et al.           Expires September 15, 2018              [Page 33]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1900,7 +1904,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 34]
+Voit, et al.           Expires September 15, 2018              [Page 34]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -1956,7 +1960,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 35]
+Voit, et al.           Expires September 15, 2018              [Page 35]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -2012,7 +2016,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 36]
+Voit, et al.           Expires September 15, 2018              [Page 36]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -2068,7 +2072,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 37]
+Voit, et al.           Expires September 15, 2018              [Page 37]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -2124,7 +2128,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 38]
+Voit, et al.           Expires September 15, 2018              [Page 38]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -2180,7 +2184,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 39]
+Voit, et al.           Expires September 15, 2018              [Page 39]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -2218,6 +2222,7 @@ Internet-Draft          Subscribed Notifications              March 2018
     }
   }
 
+
   rc:yang-data establish-subscription-error-stream {
     container establish-subscription-error-stream {
       description
@@ -2232,15 +2237,15 @@ Internet-Draft          Subscribed Notifications              March 2018
         type identityref {
           base establish-subscription-error;
         }
-        description
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 40]
+Voit, et al.           Expires September 15, 2018              [Page 40]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
 
+        description
           "Indicates the reason why the subscription has failed to
           be created to a targeted stream.";
         }
@@ -2288,15 +2293,15 @@ Internet-Draft          Subscribed Notifications              March 2018
   rc:yang-data modify-subscription-error-stream {
     container modify-subscription-error-stream {
       description
-        "This yang-data MAY be provided as part of a subscription's RPC
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 41]
+Voit, et al.           Expires September 15, 2018              [Page 41]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
 
+        "This yang-data MAY be provided as part of a subscription's RPC
         error response when there is a failure of a
         'modify-subscription' RPC which has been made against a
         stream.  This yang-data MUST be used if hints are to be
@@ -2344,15 +2349,15 @@ Internet-Draft          Subscribed Notifications              March 2018
     input {
       leaf identifier {
         type subscription-id;
-        mandatory true;
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 42]
+Voit, et al.           Expires September 15, 2018              [Page 42]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
 
+        mandatory true;
         description
           "Identifier of the subscription that is to be deleted. Only
             subscriptions that were created using establish-subscription
@@ -2403,8 +2408,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-
-Voit, et al.           Expires September 13, 2018              [Page 43]
+Voit, et al.           Expires September 15, 2018              [Page 43]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -2460,7 +2464,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 44]
+Voit, et al.           Expires September 15, 2018              [Page 44]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -2516,7 +2520,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 45]
+Voit, et al.           Expires September 15, 2018              [Page 45]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -2572,7 +2576,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 46]
+Voit, et al.           Expires September 15, 2018              [Page 46]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -2628,7 +2632,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 47]
+Voit, et al.           Expires September 15, 2018              [Page 47]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -2684,7 +2688,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 48]
+Voit, et al.           Expires September 15, 2018              [Page 48]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -2740,7 +2744,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 49]
+Voit, et al.           Expires September 15, 2018              [Page 49]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -2750,8 +2754,10 @@ Internet-Draft          Subscribed Notifications              March 2018
             config false;
             description
               "Operational data which provides the number of event
-               records from a stream explicitly removed via filtering so
-               that they are not sent to a receiver.";
+               records from a stream explicitly removed via a stream
+               filter so that they are not sent to a receiver.  This
+               count does not include event records filtered from a
+               stream as a result of access control filtering.";
             }
           leaf state {
             type enumeration {
@@ -2791,16 +2797,16 @@ Internet-Draft          Subscribed Notifications              March 2018
             mandatory true;
             description
               "Specifies the state of a subscription from the
-              perspective of a particular receiver.  With this info it
-              is possible to determine whether a subscriber is currently
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 50]
+Voit, et al.           Expires September 15, 2018              [Page 50]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
 
+              perspective of a particular receiver.  With this info it
+              is possible to determine whether a subscriber is currently
               generating notification messages intended for that
               receiver.";
           }
@@ -2847,16 +2853,16 @@ Internet-Draft          Subscribed Notifications              March 2018
 
    An implementation may choose to transition between active and
    suspended subscription states more frequently than required by this
-   specification.  However if a subscription is unable to marshal all
-   intended updates into a transmittable message in multiple successive
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 51]
+Voit, et al.           Expires September 15, 2018              [Page 51]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
 
+   specification.  However if a subscription is unable to marshal all
+   intended updates into a transmittable message in multiple successive
    intervals, the subscription SHOULD be suspended with the reason
    "unsupportable-volume".
 
@@ -2903,16 +2909,16 @@ Internet-Draft          Subscribed Notifications              March 2018
    occurs, the subscription state MUST be updated accordingly and the
    receivers notified with subscription state notifications.
 
-   If a malicious or buggy subscriber sends an unexpectedly large number
-   of RPCs, the result might be an excessive use of system resources on
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 52]
+Voit, et al.           Expires September 15, 2018              [Page 52]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
 
+   If a malicious or buggy subscriber sends an unexpectedly large number
+   of RPCs, the result might be an excessive use of system resources on
    the publisher or subscriber.  In such a situation, subscription
    interactions MAY be terminated by terminating the transport session.
 
@@ -2936,8 +2942,8 @@ Internet-Draft          Subscribed Notifications              March 2018
 
    The NETCONF Authorization Control Model [RFC6536bis] SHOULD be used
    to control and restrict authorization of subscription configuration.
-   This control models permits specifying per-receiver permissions to
-   receive event records from specific streams.
+   This model permits the specifying per-receiver permissions, and the
+   per-receiver exclusion of event records from subscribed streams.
 
    Where NACM is available, the NACM "very-secure" tag MUST be placed on
    the "kill-subscription" RPC so that only administrators have access
@@ -2955,7 +2961,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    Balazs Lengyel, Robert Wilton, Sharon Chisholm, Hector Trevino, Susan
    Hares, Michael Scharf, and Guangying Zheng.
 
-7.  References
 
 
 
@@ -2963,11 +2968,12 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-
-Voit, et al.           Expires September 13, 2018              [Page 53]
+Voit, et al.           Expires September 15, 2018              [Page 53]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
+
+7.  References
 
 7.1.  Normative References
 
@@ -3018,9 +3024,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-
-
-Voit, et al.           Expires September 13, 2018              [Page 54]
+Voit, et al.           Expires September 15, 2018              [Page 54]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -3076,7 +3080,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 55]
+Voit, et al.           Expires September 15, 2018              [Page 55]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -3087,6 +3091,9 @@ Appendix A.  Changes between revisions
 
    v10 - v11
 
+   o  Access control filtering of events in streams included to match
+      RFC5277 behavior
+	  
    o  Minor updates based on LC reviews
 
    v09 - v10
@@ -3132,7 +3139,7 @@ Appendix A.  Changes between revisions
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 56]
+Voit, et al.           Expires September 15, 2018              [Page 56]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -3188,7 +3195,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 57]
+Voit, et al.           Expires September 15, 2018              [Page 57]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -3244,7 +3251,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 58]
+Voit, et al.           Expires September 15, 2018              [Page 58]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
@@ -3300,4 +3307,4 @@ Authors' Addresses
 
 
 
-Voit, et al.           Expires September 13, 2018              [Page 59]
+Voit, et al.           Expires September 15, 2018              [Page 59]
