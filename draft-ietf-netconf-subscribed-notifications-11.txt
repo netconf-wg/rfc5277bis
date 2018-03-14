@@ -350,8 +350,9 @@ Internet-Draft          Subscribed Notifications              March 2018
    Access control permissions may be used to silently exclude event
    records from within a stream for which the subscriber has no read
    access.  As an example of how this might be accomplished, see
-   [RFC6536bis] section 3.4.6.  Note that per Section 2.7, subscription
-   state change notifications are never filtered out.
+   [RFC6536bis] section 3.4.6.  Note that per Section 2.7 of this
+   document, subscription state change notifications are never filtered 
+   out.
 
    If no access control permissions are in place for stream content,
    then a receiver MUST be allowed access to all the event records on
