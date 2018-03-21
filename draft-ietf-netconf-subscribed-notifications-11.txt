@@ -1,4 +1,4 @@
-PRE-DRAFT:  March 18 2018
+PRE-DRAFT:  March 21 2018
 *************************
 
 
@@ -91,17 +91,17 @@ Table of Contents
      3.1.  Event Streams Container . . . . . . . . . . . . . . . . .  28
      3.2.  Event Stream Filters Container  . . . . . . . . . . . . .  28
      3.3.  Subscriptions Container . . . . . . . . . . . . . . . . .  29
-   4.  Data Model  . . . . . . . . . . . . . . . . . . . . . . . . .  31
+   4.  Data Model  . . . . . . . . . . . . . . . . . . . . . . . . .  30
    5.  Considerations  . . . . . . . . . . . . . . . . . . . . . . .  56
      5.1.  Implementation Considerations . . . . . . . . . . . . . .  56
-     5.2.  IANA Considerations . . . . . . . . . . . . . . . . . . .  57
+     5.2.  IANA Considerations . . . . . . . . . . . . . . . . . . .  56
      5.3.  Security Considerations . . . . . . . . . . . . . . . . .  57
    6.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  60
    7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  60
      7.1.  Normative References  . . . . . . . . . . . . . . . . . .  60
      7.2.  Informative References  . . . . . . . . . . . . . . . . .  61
-   Appendix A.  Changes between revisions  . . . . . . . . . . . . .  63
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  67
+   Appendix A.  Changes between revisions  . . . . . . . . . . . . .  62
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  66
 
 1.  Introduction
 
@@ -189,7 +189,7 @@ Internet-Draft          Subscribed Notifications              March 2018
    Notification message: Information intended for a receiver indicating
    that one or more event(s) have occurred.  A notification message may
    bundle multiple event records.  This includes the bundling of
-   multiple, independent [RFC7950] YANG notifications.
+   multiple, independent [RFC7950] notifications.
 
    Publisher: An entity responsible for streaming notification messages
    per the terms of a subscription.
@@ -268,7 +268,8 @@ Internet-Draft          Subscribed Notifications              March 2018
    o  Configured subscriptions can be modified by any configuration
       client with write permission on the configuration of the
       subscription.  Dynamic subscriptions can only be modified via an
-      RPC request made by the original subscriber.
+      RPC request made by the original subscriber, or a change to
+      configuration data referenced by the subscription.
 
    Note that there is no mixing-and-matching of dynamic and configured
    operations on a single subscription.  Specifically, a configured
@@ -277,7 +278,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    modified through configuration operations.  Also note that transport
    specific transport drafts based on this specification MUST detail the
    life cycles of both dynamic and configured subscriptions.
-
 
 
 
@@ -309,9 +309,7 @@ Internet-Draft          Subscribed Notifications              March 2018
    o  the RPC operations in this draft replaces the operation "create-
       subscription" defined in [RFC5277], section 4.
 
-   o  the one way operation of [RFC5277], Section 4 is still used.
-      However this message will no longer be required with the
-      availability of [I.D.draft-ietf-netconf-notification-messages].
+   o  the one way operation of [RFC5277], Section 4 is used.
 
    o  the included contents of the "NETCONF" stream are identical
       between this document and [RFC5277].
@@ -321,6 +319,10 @@ Internet-Draft          Subscribed Notifications              March 2018
       in order to support old clients.  However the use of both
       alternatives on a single transport session is prohibited.
 
+   o  unlike [RFC5277], this document enables a single transport session
+      to intermix of notification messages and RPCs for different
+      subscriptions.
+
 2.  Solution
 
 2.1.  Event Streams
@@ -328,12 +330,10 @@ Internet-Draft          Subscribed Notifications              March 2018
    An event stream is a named entity on a publisher which exposes a
    continuously updating set of event records.  Each event stream is
    available for subscription.  It is out of the scope of this document
-   to identify a) how streams are defined, b) how event records are
-   defined/generated, and c) how event records are assigned to streams.
+   to identify a) how streams are defined (other than the NETCONF
+   stream), b) how event records are defined/generated, and c) how event
+   records are assigned to streams.
 
-   There is only one reserved event stream within this document:
-   "NETCONF".  The "NETCONF" event stream contains all NETCONF XML event
-   record information supported by the publisher, except for where it
 
 
 
@@ -342,12 +342,15 @@ Voit, et al.           Expires September 19, 2018               [Page 6]
 Internet-Draft          Subscribed Notifications              March 2018
 
 
+   There is only one reserved event stream name within this document:
+   "NETCONF".  The "NETCONF" event stream contains all NETCONF XML event
+   record information supported by the publisher, except for where it
    has been explicitly indicated that this the event record MUST be
    excluded from the "NETCONF" stream.  The "NETCONF" stream will
-   include individual YANG notifications as per [RFC7950] section 7.16.
-   Each of these YANG notifications will be treated as a distinct event
-   record.  Beyond the "NETCONF" stream, implementations are free to add
-   additional event streams.
+   include individual notifications as per [RFC7950] section 7.16.  Each
+   of these notifications will be treated as a distinct event record.
+   Beyond the "NETCONF" stream, implementations MAY define additional
+   event streams.
 
    As event records are created by a system, they may be assigned to one
    or more streams.  The event record is distributed to subscription's
@@ -369,12 +372,14 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 2.2.  Event Stream Filters
 
-   This document defines an extensible filtering mechanism.  Two
-   optional stream filtering syntaxes supported are [XPATH] and subtree
-   [RFC6241].  A match on a filter always results in an action upon a
-   complete event record.  Information is never stripped from within an
-   event record prior to that event record being encapsulated within a
-   notification message.
+   This document defines an extensible filtering mechanism.  The filter
+   itself is a boolean test which is placed on the content of an event
+   record.  A 'false' filtering result causes the event message to be
+   excluded from delivery to a receiver.  A filter never results in
+   information being stripped from within an event record prior to that
+   event record being encapsulated within a notification message.  The
+   two optional stream filtering syntaxes supported are [XPATH] and
+   subtree [RFC6241].
 
    If no stream filter is provided within a subscription, all event
    records on a stream are to be sent.
@@ -385,11 +390,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    These parameters indicate the treatment of a subscription relative to
    other traffic between publisher and receiver.  Included are:
 
-   o  A "dscp" QoS marking to differentiate transport QoS behavior.
-      Where provided, this marking MUST be stamped on notification
-      messages.
-
-
 
 
 
@@ -398,13 +398,15 @@ Voit, et al.           Expires September 19, 2018               [Page 7]
 Internet-Draft          Subscribed Notifications              March 2018
 
 
+   o  A "dscp" QoS marking to differentiate transport QoS behavior.
+      Where provided, this marking MUST be stamped on notification
+      messages.
+
    o  A "weighting" so that bandwidth proportional to this weighting can
       be allocated to this subscription relative to other subscriptions
       destined for that receiver.
 
-   o  a "dependency" upon another subscription.  Notification messages
-      MUST NOT be sent prior to other notification messages containing
-      update record(s) for the referenced subscription.
+   o  a "dependency" upon another subscription.
 
    Dequeuing of notification messages across independent subscriptions
    to a receiver SHOULD be allocated bandwidth proportionally based on
@@ -421,11 +423,12 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 2.4.  Dynamic Subscriptions
 
-   Dynamic subscriptions are managed via RPCs, and are made against
-   targets located within the publisher.  These RPCs have been designed
-   extensibly so that they may be augmented for subscription targets
-   beyond event streams.  For examples of such augmentations, see the
-   RPC augmentations within [I-D.ietf-netconf-yang-push]'s YANG model.
+   Dynamic subscriptions are managed via protocol operations (in the
+   form of [RFC7950], Section 7.14 RPCs) made against targets located
+   within the publisher.  These RPCs have been designed extensibly so
+   that they may be augmented for subscription targets beyond event
+   streams.  For examples of such augmentations, see the RPC
+   augmentations within [I-D.ietf-netconf-yang-push]'s YANG model.
 
 2.4.1.  Dynamic Subscription State Model
 
@@ -438,9 +441,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    the YANG model appear in upper-case letters; in addition, start and
    end states are depicted to reflect subscription creation and deletion
    events.
-
-
-
 
 
 
@@ -477,7 +477,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
         * indicates a state change notification
 
-               Publisher's state for a dynamic subscription
+          Figure 1: Publisher's state for a dynamic subscription
 
    Of interest in this state machine are the following:
 
@@ -511,7 +511,7 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
    addition, the transport session MUST support the pipelining of RPC
-   requests made on independent subscriptions.
+   requests made for different subscriptions.
 
    The input parameters of the operation are:
 
@@ -590,7 +590,7 @@ Internet-Draft          Subscribed Notifications              March 2018
        +--ro output
           +--ro identifier                subscription-id
 
-             Figure 1: establish-subscription RPC tree diagram
+             Figure 2: establish-subscription RPC tree diagram
 
    A publisher MAY reject the "establish-subscription" RPC for many
    reasons as described in Section 2.4.6.  The contents of the resulting
@@ -606,7 +606,7 @@ Internet-Draft          Subscribed Notifications              March 2018
              +--ro filter-failure-hint?      string
              +--ro replay-start-time-hint?   yang:date-and-time
 
-        Figure 2: establish-subscription RPC yang-data tree diagram
+        Figure 3: establish-subscription RPC yang-data tree diagram
 
 2.4.2.1.  Requesting a replay of event records
 
@@ -634,15 +634,17 @@ Internet-Draft          Subscribed Notifications              March 2018
 
    The inclusion of a replay-start-time within an "establish-
    subscription" RPC indicates a replay request.  If the "replay-start-
-   time" contains a value that is earlier than content stored within the
-   publisher's replay buffer, then the subscription MUST be rejected,
-   and the leaf "replay-start-time-hint" MUST be set in the reply.
+   time" contains a value that is earlier than what a publisher's
+   retained history supports, then the subscription MUST be rejected and
+   the leaf "replay-start-time-hint" MUST be set in the reply.
 
-   IIf a "stop-time" parameter is included, it MAY also be earlier than
-   the current time and MUST be later than the "replay-start-time".
+   If a "replay-start-time" has been provided, a "stop-time" parameter
+   may also be included.  This "stop-time" MAY be earlier than the
+   current time, but MUST be later than the "replay-start-time", should
+   that object also be provided.
 
-   If the "replay-start-time" is later than any information stored in
-   the replay buffer, then the publisher MUST send a "replay-completed"
+   If the "replay-start-time" is later the scope of time covered by the
+   replay buffer, then the publisher MUST send a "replay-completed"
    notification immediately after the after a successful establish-
    subscription RPC response.
 
@@ -652,7 +654,7 @@ Internet-Draft          Subscribed Notifications              March 2018
    of saved notifications available to accommodate any given replay
    request.  To assess the availability of replay, subscribers can read
    the leafs "replay-log-creation-time" and "replay-log-aged-time".  See
-   Figure 15 for the tree describing these elements.  The actual size of
+   Figure 18 for the tree describing these elements.  The actual size of
    the replay log at any given time is a publisher specific matter.
    Control parameters for the replay log are outside the scope of this
    document.
@@ -666,9 +668,7 @@ Internet-Draft          Subscribed Notifications              March 2018
    modifications, it acknowledges success to the subscriber, then
    immediately starts sending event records based on the new terms.
 
-   Dynamic subscriptions can only be modified using the same transport
-   session used to establish that subscription.  Subscriptions created
-   by configuration operations cannot be modified via this RPC.
+
 
 
 
@@ -677,6 +677,10 @@ Voit, et al.           Expires September 19, 2018              [Page 12]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
+
+   Subscriptions created by configuration cannot be modified via this
+   RPC.  However configuration may be used to modify objects referenced
+   by the subscription (such as a referenced filter).
 
    Below is a tree diagram for "modify-subscription".  All objects
    contained in this tree are described within the included YANG model
@@ -699,7 +703,7 @@ Internet-Draft          Subscribed Notifications              March 2018
           |                                       yang:xpath1.0 {xpath}?
           +---w stop-time?               yang:date-and-time
 
-              Figure 3: modify-subscription RPC tree diagram
+              Figure 4: modify-subscription RPC tree diagram
 
    If the publisher accepts the requested modifications on a currently
    suspended subscription, the subscription will immediately be resumed
@@ -725,10 +729,6 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-
-
-
-
 Voit, et al.           Expires September 19, 2018              [Page 13]
 
 Internet-Draft          Subscribed Notifications              March 2018
@@ -739,7 +739,7 @@ Internet-Draft          Subscribed Notifications              March 2018
              +--ro reason?                identityref
              +--ro filter-failure-hint?   string
 
-         Figure 4: modify-subscription RPC yang-data tree diagram
+         Figure 5: modify-subscription RPC yang-data tree diagram
 
 2.4.4.  Deleting a Dynamic Subscription
 
@@ -759,7 +759,7 @@ Internet-Draft          Subscribed Notifications              March 2018
           +---w input
              +---w identifier    subscription-id
 
-              Figure 5: delete-subscription RPC tree diagram
+              Figure 6: delete-subscription RPC tree diagram
 
    Dynamic subscriptions can only be deleted via this RPC using the same
    transport session previously used for subscription establishment.
@@ -798,22 +798,23 @@ Internet-Draft          Subscribed Notifications              March 2018
           +---w input
              +---w identifier    subscription-id
 
-               Figure 6: kill-subscription RPC tree diagram
+               Figure 7: kill-subscription RPC tree diagram
 
 2.4.6.  RPC Failures
 
-   Whenever an RPC is unsuccessful, the publisher returns relevant error
-   codes as part of the RPC error response.  RPC error codes returned
-   include both existing transport layer RPC error codes, such as those
-   seen with NETCONF in [RFC6241] Appendix A, or with RESTCONF in
-   [RFC8040] Section 7.1. as well as subscription specific errors such
-   as those defined within this document's YANG model.  As a result of
-   this mixture, how subscription errors are encoded within an RPC error
-   response is transport dependent.
+   Whenever an RPC is unsuccessful, the publisher returns relevant
+   information as part of the RPC error response.  Transport level error
+   processing MUST be done before RPC error processing described in this
+   section.  In all cases, RPC error information returned will use
+   existing transport layer RPC structures, such as those seen with
+   NETCONF in [RFC6241] Appendix A, or with RESTCONF in [RFC8040]
+   Section 7.1.  These structures MUST be able to encode subscription
+   specific errors identified below and defined within this document's
+   YANG model.
 
-   Specific errors included within this document's YANG model MUST be
-   returned as part of the RPC error response.  Following are valid
-   errors which can occur for each RPC:
+   As a result of this mixture, how subscription errors are encoded
+   within an RPC error response is transport dependent.  Following are
+   valid errors which can occur for each RPC:
 
     establish-subscription         modify-subscription
     ----------------------         -------------------
@@ -837,7 +838,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    1.  "establish-subscription-error-stream": This MUST be returned if
        an RPC error reason has not been placed elsewhere within the
        transport portion of a failed "establish-subscription" RPC
-
 
 
 
@@ -941,15 +941,15 @@ Internet-Draft          Subscribed Notifications              March 2018
  [evaluate]: decision point on whether the subscription is supportable
  (*): resulting subscription state change notification
 
-            Publisher state model for a configured subscription
+       Figure 8: Publisher state model for a configured subscription
 
    A VALID subscription may become INVALID on one of two ways.  First,
    it may be modified in a way which fails a re-evaluation.  See (1) in
-   the diagram.  Second, the publisher itself might determine that the
-   subscription is no longer supportable.  See (2) in the diagram.  In
-   either case, a "subscription-terminated" notification is sent to any
-   active or suspended receivers.  A VALID subscription may also
-   transition to a CONCLUDED state via (4) if a configured stop time has
+   the diagram.  Second, the publisher might determine that the
+   subscription is no longer supportable.  This could be for reasons of
+   an unexpected but sustained increase in stream events, degraded CPU
+   capacity, a more complex referenced filter, or other higher priority
+   subscriptions which have usurped resources.  See (2) in the diagram.
 
 
 
@@ -958,6 +958,9 @@ Voit, et al.           Expires September 19, 2018              [Page 17]
 Internet-Draft          Subscribed Notifications              March 2018
 
 
+   No matter the case, a "subscription-terminated" notification is sent
+   to any active or suspended receivers.  A VALID subscription may also
+   transition to a CONCLUDED state via (4) if a configured stop time has
    been reached.  In this case, a "subscription-concluded" is sent to
    any ACTIVE or SUSPENDED receivers.  Finally, a subscription may be
    deleted by configuration (3).
@@ -965,16 +968,16 @@ Internet-Draft          Subscribed Notifications              March 2018
    When a subscription is considered VALID, a publisher will attempt to
    connect with all configured receivers and deliver notification
    messages.  Below is the state machine for each receiver of a
-   configured subscription.  This receiver state machine itself is fully
+   configured subscription.  This receiver state machine is fully
    contained within the state machine of the configured subscription,
-   and is only relevant when the configured subscription itself is in
-   the VALID state.
+   and is only relevant when the configured subscription is in the VALID
+   state.
 
      .-----------------------------------------------------------------.
      |                         VALID                                   |
      |   .----------.                           .--------.             |
      |   | receiver |------------------timeout->|receiver|             |
-     |   |CONNECTING|<------------------reset---|TIMEOUT |             |
+     |   |CONNECTING|<----------------reset--(4)|TIMEOUT |             |
      |   |          |<-transport---.            '--------'             |
      |   '----------'  loss,reset  |                                   |
      |      (1)          |         |                                   |
@@ -992,20 +995,17 @@ Internet-Draft          Subscribed Notifications              March 2018
    states for an individual receiver of a VALID configured subscription.
    * indicates a state change notification
 
-               Receiver state for a configured subscription
+          Figure 9: Receiver state for a configured subscription
 
    When a subscription first becomes VALID, the operational state of
    each receiver is initialized to CONNECTING.  If transport
    connectivity is not available to any receiver, a transport session is
    established (e.g., through [RFC8071]).  Individual receivers are
    moved to an ACTIVE state when a "subscription-started" state change
-   notification is successfully passed to that receiver (1).  Configured
-   receivers remain ACTIVE if both transport connectivity can be
-   verified to the receiver, and event records are not being dropped due
-   to a publisher buffer overflow.  The result is that a receiver will
-   remain ACTIVE on the publisher as long as events aren't being lost,
-   or the receiver cannot be reached.  However if there is buffer
-   overflow, or the publisher cannot generate events for a receiver, the
+   notification is successfully passed to that receiver (1).  Event
+   records are only sent to ACTIVE receivers.  Configured receivers
+   remain ACTIVE if both transport connectivity can be verified to the
+   receiver, and event records are not being dropped due to a publisher
 
 
 
@@ -1014,10 +1014,14 @@ Voit, et al.           Expires September 19, 2018              [Page 18]
 Internet-Draft          Subscribed Notifications              March 2018
 
 
-   receiver MUST be moved to SUSPENDED (2).  In addition, a configured
-   subscription's receiver MUST be moved to CONNECTING if transport
-   connectivity cannot be achieved, or if the receiver is reset via
-   configuration (3).  For more on reset, see Section 2.5.5.
+   buffer overflow.  The result is that a receiver will remain ACTIVE on
+   the publisher as long as events aren't being lost, or the receiver
+   cannot be reached.  However if there is buffer overflow, or the
+   publisher cannot generate events for a receiver, the receiver MUST be
+   moved to SUSPENDED (2).  In addition, a configured subscription's
+   receiver MUST be moved to CONNECTING if transport connectivity cannot
+   be achieved, or if the receiver is reset via the "reset"
+   configuration action (3), (4).  For more on reset, see Section 2.5.5.
 
    A configured subscription's receiver MUST be moved to a SUSPENDED
    state if there is transport connectivity between the publisher and
@@ -1034,11 +1038,11 @@ Internet-Draft          Subscribed Notifications              March 2018
    informed of the modification.  However this notification will await
    the end of the suspension for that receiver.
 
-   The mechanisms described above are mirrored in the RPCs and YANG
+   The mechanisms described above are mirrored in the RPCs and
    notifications within the document.  It should be noted that these
-   RPCs and YANG notifications have been designed to be extensible and
-   allow subscriptions into targets other than event streams.  The YANG
-   model of [I-D.ietf-netconf-yang-push] Section 4.1 provides many such
+   RPCs and notifications have been designed to be extensible and allow
+   subscriptions into targets other than event streams.  The YANG model
+   of [I-D.ietf-netconf-yang-push] Section 4.1 provides many such
    extensions; this includes the augmentation of "/modify-
    subscription/input/target".
 
@@ -1058,10 +1062,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    to each receiver.  It is quite possible that upon configuration,
    reboot, or even steady-state operations, a transport session may not
    be currently available to the receiver.  In this case, when there is
-   something to transport for an active subscription, transport specific
-   call-home operations will be used to establish the connection.  When
-   transport connectivity is available, notification messages may then
-   be pushed.
 
 
 
@@ -1069,6 +1069,11 @@ Voit, et al.           Expires September 19, 2018              [Page 19]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
+
+   something to transport for an active subscription, transport specific
+   call-home operations will be used to establish the connection.  When
+   transport connectivity is available, notification messages may then
+   be pushed.
 
    With active configured subscriptions, it is allowable to buffer event
    records even after a "subscription-started" has been sent.  However
@@ -1108,16 +1113,11 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 2.5.4.  Deleting a Configured Subscription
 
-   Subscriptions can be deleted using configuration operations against
-   the top-level "subscriptions" subtree.
+   Subscriptions can be deleted through configuration against the top-
+   level "subscriptions" subtree.
 
    Immediately after a subscription is successfully deleted, the
    publisher sends to all receivers of that subscription a state change
-   notification stating the subscription has ended (i.e., "subscription-
-   terminated").
-
-
-
 
 
 
@@ -1125,6 +1125,9 @@ Voit, et al.           Expires September 19, 2018              [Page 20]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
+
+   notification stating the subscription has ended (i.e., "subscription-
+   terminated").
 
 2.5.5.  Resetting a Configured Receiver
 
@@ -1160,20 +1163,17 @@ Internet-Draft          Subscribed Notifications              March 2018
    messages are sent over the session used to establish the
    subscription.  For configured subscriptions, notification messages
    are sent over the connections specified by the transport, plus
-   receiver IP address and port configured.  In all cases, a single
-   transport session MUST be able to support the intermixing of event
-   records, RPCs, and state change notifications from independent
-   subscriptions.
+   receiver IP address and port configured.  (* Update based on IETF 101
+   WG discussion *) In all cases, a single transport session MUST be
+   capable of supporting the intermixing of RPCs and notifications from
+   different subscriptions.
 
    A notification message is sent to a receiver when an event record is
-   not blocked by the specified filter criteria.  This notification
-   message MUST be encoded in a <notification> message as defined in
-   [RFC5277], Section 4.  A subscription's events MUST NOT be sent to a
-   receiver until after a corresponding RPC response (in the case of a
-   dynamic subscription) or state-change notification (in the case of a
-   configured subscription) has been passed receiver indicating that
-   events should be expected.  The following example within [RFC7950]
-   section 7.16.3 is an example of a compliant message:
+   not blocked by either the specified filter criteria or receiver
+   permissions.  This notification message MUST be encoded in a
+   <notification> message as defined in [RFC5277], Section 4.  A
+   subscription's events MUST NOT be sent to a receiver until after a
+   corresponding RPC response (in the case of a dynamic subscription) or
 
 
 
@@ -1181,6 +1181,10 @@ Voit, et al.           Expires September 19, 2018              [Page 21]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
+
+   state-change notification (in the case of a configured subscription)
+   has been passed receiver.  The following example within [RFC7950]
+   section 7.16.3 is an example of a compliant message:
 
       <notification
              xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
@@ -1192,7 +1196,7 @@ Internet-Draft          Subscribed Notifications              March 2018
           </link-failure>
       </notification>
 
-                 Figure 7: subscribed notification message
+                Figure 10: subscribed notification message
 
 2.7.  Subscription State Notifications
 
@@ -1227,10 +1231,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    will still provide the contents of that referenced filter under the
    "within-subscription" subtree.
 
-   Note that for dynamic subscriptions, no "subscription-started"
-   notifications are ever sent.
-
-
 
 
 Voit, et al.           Expires September 19, 2018              [Page 22]
@@ -1238,51 +1238,51 @@ Voit, et al.           Expires September 19, 2018              [Page 22]
 Internet-Draft          Subscribed Notifications              March 2018
 
 
+   Note that for dynamic subscriptions, no "subscription-started"
+   notifications are ever sent.
+
    Below is a tree diagram for "subscription-started".  All objects
    contained in this tree are described within the included YANG model
    within Section 4.
 
-+---n subscription-started {configured}?
-   +--ro identifier               subscription-id
-   +--ro transport                 transport {configured}?
-   +--ro encoding                 encoding
-   +--ro (target)
-   |  +--:(stream)
-   |     +--ro (stream-filter)?
-   |     |  +--:(by-reference)
-   |     |  |  +--ro stream-filter-ref        stream-filter-ref
-   |     |  +--:(within-subscription)
-   |     |     +--ro (filter-spec)?
-   |     |        +--:(stream-subtree-filter)
-   |     |        |  +--ro stream-subtree-filter?    {subtree}?
-   |     |        +--:(stream-xpath-filter)
-   |     |           +--ro stream-xpath-filter?   yang:xpath1.0 {xpath}?
-   |     +--ro stream                   stream
-   |     +--ro replay-start-time?       yang:date-and-time {replay}?
-   +--ro stop-time?               yang:date-and-time
-   +--ro dscp?                    inet:dscp {qos}?
-   +--ro weighting?               uint8 {qos}?
-   +--ro dependency?              sn:subscription-id {qos}?
+       +---n subscription-started {configured}?
+          +--ro identifier               subscription-id
+          +--ro transport                transport {configured}?
+          +--ro encoding                 encoding
+          +--ro (target)
+          |  +--:(stream)
+          |     +--ro (stream-filter)?
+          |     |  +--:(by-reference)
+          |     |  |  +--ro stream-filter-ref        stream-filter-ref
+          |     |  +--:(within-subscription)
+          |     |     +--ro (filter-spec)?
+          |     |        +--:(stream-subtree-filter)
+          |     |        |  +--ro stream-subtree-filter?   <anydata>
+          |     |        |          {subtree}?
+          |     |        +--:(stream-xpath-filter)
+          |     |           +--ro stream-xpath-filter?     yang:xpath1.0
+          |     |                   {xpath}?
+          |     +--ro stream                   stream-ref
+          |     +--ro replay-start-time?       yang:date-and-time
+          |             {replay}?
+          +--ro stop-time?               yang:date-and-time
+          +--ro dscp?                    inet:dscp {qos}?
+          +--ro weighting?               uint8 {qos}?
+          +--ro dependency?              subscription-id {qos}?
 
-         Figure 8: subscription-started notification tree diagram
+
+         Figure 11: subscription-started notification tree diagram
 
 2.7.2.  subscription-modified
 
    This notification indicates that a subscription has been modified by
-   configuration operations.
+   configuration operations.  It is delivered directly after the last
+   event records processed using the previous subscription parameters,
+   and before any event records processed after the modification.
 
    Below is a tree diagram for "subscription-modified".  All objects
    contained in this tree are described within the included YANG model
    within Section 4.
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1294,29 +1294,33 @@ Voit, et al.           Expires September 19, 2018              [Page 23]
 Internet-Draft          Subscribed Notifications              March 2018
 
 
-+---n subscription-modified {configured}?
-   +--ro identifier               subscription-id
-   +--ro transport                 transport {configured}?
-   +--ro encoding                 encoding
-   +--ro (target)
-   |  +--:(stream)
-   |     +--ro (stream-filter)?
-   |     |  +--:(by-reference)
-   |     |  |  +--ro stream-filter-ref        stream-filter-ref
-   |     |  +--:(within-subscription)
-   |     |     +--ro (filter-spec)?
-   |     |        +--:(stream-subtree-filter)
-   |     |        |  +--ro stream-subtree-filter?    {subtree}?
-   |     |        +--:(stream-xpath-filter)
-   |     |           +--ro stream-xpath-filter?   yang:xpath1.0 {xpath}?
-   |     +--ro stream                   stream
-   |     +--ro replay-start-time?       yang:date-and-time {replay}?
-   +--ro stop-time?               yang:date-and-time
-   +--ro dscp?                    inet:dscp {qos}?
-   +--ro weighting?               uint8 {qos}?
-   +--ro dependency?              sn:subscription-id {qos}?
+       +---n subscription-modified
+          +--ro identifier               subscription-id
+          +--ro transport                transport {configured}?
+          +--ro encoding                 encoding
+          +--ro (target)
+          |  +--:(stream)
+          |     +--ro (stream-filter)?
+          |     |  +--:(by-reference)
+          |     |  |  +--ro stream-filter-ref        stream-filter-ref
+          |     |  +--:(within-subscription)
+          |     |     +--ro (filter-spec)?
+          |     |        +--:(stream-subtree-filter)
+          |     |        |  +--ro stream-subtree-filter?   <anydata>
+          |     |        |          {subtree}?
+          |     |        +--:(stream-xpath-filter)
+          |     |           +--ro stream-xpath-filter?     yang:xpath1.0
+          |     |                   {xpath}?
+          |     +--ro stream                   stream-ref
+          |     +--ro replay-start-time?       yang:date-and-time
+          |             {replay}?
+          +--ro stop-time?               yang:date-and-time
+          +--ro dscp?                    inet:dscp {qos}?
+          +--ro weighting?               uint8 {qos}?
+          +--ro dependency?              subscription-id {qos}?
 
-         Figure 9: subscription-modified notification tree diagram
+
+        Figure 12: subscription-modified notification tree diagram
 
    A publisher most often sends this notification directly after the
    modification of any configuration parameters impacting a configured
@@ -1335,12 +1339,8 @@ Internet-Draft          Subscribed Notifications              March 2018
        of the filter identified by the subscription's "stream-filter-
        ref" leaf has changed.
 
-2.7.3.  subscription-terminated
 
-   A publisher MAY terminate pushing subscribed event records to a
-   receiver.  This notification indicates that no further notification
-   messages should be expected from the publisher.  A publisher may
-   terminate a subscription for the following reasons:
+
 
 
 
@@ -1349,6 +1349,13 @@ Voit, et al.           Expires September 19, 2018              [Page 24]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
+
+2.7.3.  subscription-terminated
+
+   A publisher MAY terminate pushing subscribed event records to a
+   receiver.  This notification indicates that no further notification
+   messages should be expected from the publisher.  A publisher may
+   terminate a subscription for the following reasons:
 
    1.  Configuration which removes a configured subscription, or a
        "kill-subscription" RPC.  These are identified via the reason
@@ -1374,14 +1381,12 @@ Internet-Draft          Subscribed Notifications              March 2018
           +--ro identifier    subscription-id
           +--ro reason        identityref
 
-       Figure 10: subscription-terminated notification tree diagram
+       Figure 13: subscription-terminated notification tree diagram
 
-   Note: a subscriber can terminate an existing subscription via a
-   "delete-subscription" RPC.  In such a case, no "subscription-
-   terminated" state change notification is sent.  However if a "kill-
-   subscription" RPC is sent, or some other event other than reaching
-   the subscription's stop time results in the end of a subscription,
-   then this state change notification MUST be sent.
+   Note: this state change notification MUST be sent to a dynamic
+   subscription's receiver when the "kill-subscription" RPC is
+   successful, or other event other than reaching the subscription's
+   stop time results in the end of a subscription.
 
 2.7.4.  subscription-suspended
 
@@ -1394,17 +1399,15 @@ Internet-Draft          Subscribed Notifications              March 2018
    1.  "insufficient-resources" when a publisher is unable to produce
        the requested stream of notification messages, and
 
-   2.  "unsupportable-volume" when the bandwidth needed to get generated
-       notification messages to a receiver exceeds a threshold.
-
-
-
 
 
 Voit, et al.           Expires September 19, 2018              [Page 25]
 
 Internet-Draft          Subscribed Notifications              March 2018
 
+
+   2.  "unsupportable-volume" when the bandwidth needed to get generated
+       notification messages to a receiver exceeds a threshold.
 
    These conditions are encoded within the "reason" object.  No further
    notification will be sent until the subscription resumes or is
@@ -1418,7 +1421,7 @@ Internet-Draft          Subscribed Notifications              March 2018
           +--ro identifier    subscription-id
           +--ro reason        identityref
 
-        Figure 11: subscription-suspended notification tree diagram
+        Figure 14: subscription-suspended notification tree diagram
 
 2.7.5.  subscription-resumed
 
@@ -1434,7 +1437,7 @@ Internet-Draft          Subscribed Notifications              March 2018
        +---n subscription-resumed
           +--ro identifier    subscription-id
 
-         Figure 12: subscription-resumed notification tree diagram
+         Figure 15: subscription-resumed notification tree diagram
 
 2.7.6.  subscription-completed
 
@@ -1449,10 +1452,7 @@ Internet-Draft          Subscribed Notifications              March 2018
        +---n subscription-completed
           +--ro identifier    subscription-id
 
-        Figure 13: subscription-completed notification tree diagram
-
-
-
+        Figure 16: subscription-completed notification tree diagram
 
 
 
@@ -1465,9 +1465,9 @@ Internet-Draft          Subscribed Notifications              March 2018
 2.7.7.  replay-completed
 
    This notification indicates that all of the event records prior to
-   the current time have been sent.  This includes new event records
-   generated since the start of the subscription.  This notification
-   MUST NOT be sent for any other reason.
+   the current time have been passed to a receiver.  It is sent before
+   any notification message containing an event record with a timestamp
+   later than (1) the "stop-time" or (2) the subscription's start time.
 
    If a subscription contains no "stop-time", or has a "stop-time" that
    has not been reached, then after the "replay-completed" notification
@@ -1481,7 +1481,7 @@ Internet-Draft          Subscribed Notifications              March 2018
        +---n replay-completed
           +--ro identifier    subscription-id
 
-           Figure 14: replay-completed notification tree diagram
+           Figure 17: replay-completed notification tree diagram
 
 2.8.  Subscription Monitoring
 
@@ -1523,7 +1523,8 @@ Internet-Draft          Subscribed Notifications              March 2018
    Publishers supporting this document MUST indicate support of the YANG
    model "ietf-subscribed-notifications" within the YANG library of the
    publisher.  In addition support for optional features: "encode-xml",
-   "encode-json", "configured" "supports-vrf", and "replay" MUST also be
+   "encode-json", "configured" "supports-vrf", "qos", "xpath",
+   "subtree", "interface-designation", and "replay" MUST also be
    indicated if supported.
 
 3.  YANG Data Model Trees
@@ -1539,15 +1540,18 @@ Internet-Draft          Subscribed Notifications              March 2018
    specific event streams.  This enables subscribers to discover what
    streams a publisher supports.
 
-    +--ro streams
-       +--ro stream* [name]
-          +--ro name                        stream
-          +--ro description                 string
-          +--ro replay-support?             empty {replay}?
-          +--ro replay-log-creation-time?   yang:date-and-time {replay}?
-          +--ro replay-log-aged-time?       yang:date-and-time {replay}?
+       +--ro streams
+          +--ro stream* [name]
+             +--ro name                        string
+             +--ro description                 string
+             +--ro replay-support?             empty {replay}?
+             +--ro replay-log-creation-time?   yang:date-and-time
+             |       {replay}?
+             +--ro replay-log-aged-time?       yang:date-and-time
+                     {replay}?
 
-                 Figure 15: Stream Container tree diagram
+
+                 Figure 18: Stream Container tree diagram
 
    Above is a tree diagram for the streams container.  All objects
    contained in this tree are described within the included YANG model
@@ -1565,10 +1569,6 @@ Internet-Draft          Subscribed Notifications              March 2018
 
 
 
-
-
-
-
 Voit, et al.           Expires September 19, 2018              [Page 28]
 
 Internet-Draft          Subscribed Notifications              March 2018
@@ -1579,11 +1579,11 @@ Internet-Draft          Subscribed Notifications              March 2018
              +--rw identifier               filter-id
              +--rw (filter-spec)?
                 +--:(stream-subtree-filter)
-                |  +--rw stream-subtree-filter?    {subtree}?
+                |  +--rw stream-subtree-filter?   <anydata> {subtree}?
                 +--:(stream-xpath-filter)
                    +--rw stream-xpath-filter?     yang:xpath1.0 {xpath}?
 
-                 Figure 16: Filter Container tree diagram
+                 Figure 19: Filter Container tree diagram
 
    Above is a tree diagram for the filters container.  All objects
    contained in this tree are described within the included YANG model
@@ -1596,32 +1596,32 @@ Internet-Draft          Subscribed Notifications              March 2018
    retrieve information about the subscriptions which a publisher is
    serving.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      +--rw subscriptions
+         +--rw subscription* [identifier]
+            +--rw identifier                       subscription-id
+            +--ro configured-subscription-state?   enumeration
+            |       {configured}?
+            +--rw purpose?                         string {configured}?
+            +--rw transport                        transport
+            |       {configured}?
+            +--rw encoding                         encoding
+            +--rw (target)
+            |  +--:(stream)
+            |     +--rw (stream-filter)?
+            |     |  +--:(by-reference)
+            |     |  |  +--rw stream-filter-ref
+            |     |  |          stream-filter-ref
+            |     |  +--:(within-subscription)
+            |     |     +--rw (filter-spec)?
+            |     |        +--:(stream-subtree-filter)
+            |     |        |  +--rw stream-subtree-filter?
+            |     |        |          <anydata> {subtree}?
+            |     |        +--:(stream-xpath-filter)
+            |     |           +--rw stream-xpath-filter?
+            |     |                   yang:xpath1.0 {xpath}?
+            |     +--rw stream                           stream-ref
+            |     +--rw replay-start-time?
+            |             yang:date-and-time {replay}?
 
 
 
@@ -1630,61 +1630,34 @@ Voit, et al.           Expires September 19, 2018              [Page 29]
 Internet-Draft          Subscribed Notifications              March 2018
 
 
-    +--rw subscriptions
-       +--rw subscription* [identifier]
-          +--rw identifier                       subscription-id
-          +--ro configured-subscription-state? enumeration {configured}?
-          +--rw purpose?                         string {configured}?
-          +--rw transport                        transport {configured}?
-          +--rw encoding                         encoding
-          +--rw (target)
-          |  +--:(stream)
-          |     +--rw (stream-filter)?
-          |     |  +--:(by-reference)
-          |     |  |  +--rw stream-filter-ref          stream-filter-ref
-          |     |  +--:(within-subscription)
-          |     |     +--rw (filter-spec)?
-          |     |        +--:(stream-subtree-filter)
-          |     |        |  +--rw stream-subtree-filter?      {subtree}?
-          |     |        +--:(stream-xpath-filter)
-          |     |           +--rw stream-xpath-filter?
-          |     |                                 yang:xpath1.0 {xpath}?
-          |     +--rw stream                           stream-ref
-          |     +--rw replay-start-time?    yang:date-and-time {replay}?
-          +--rw stop-time?                       yang:date-and-time
-          +--rw dscp?                            inet:dscp {qos}?
-          +--rw weighting?                       uint8 {qos}?
-          +--rw dependency?                      subscription-id {qos}?
-          +--rw (notification-message-origin)?
-          |  +--:(interface-originated)
-          |  |  +--rw source-interface?                if:interface-ref
-          |  +--:(address-originated)
-          |     +--rw source-vrf?                      ->
-          |     |            /ni:network-instances/network-instance/name
-          |     |                                        {supports-vrf}?
-          |     +--rw source-address?           inet:ip-address-no-zone
-          +--rw receivers
-             +--rw receiver* [address port]
-                +--rw address                   inet:host
-                +--rw port                      inet:port-number
-                +--ro pushed-notifications?     yang:counter64
-                +--ro excluded-notifications?   yang:counter64
-                +--ro state                     enumeration
-                +---x reset
-                   +--ro output
-                      +--ro time    yang:date-and-time
+            +--rw stop-time?                       yang:date-and-time
+            +--rw dscp?                            inet:dscp {qos}?
+            +--rw weighting?                       uint8 {qos}?
+            +--rw dependency?                      subscription-id
+            |       {qos}?
+            +--rw (notification-message-origin)? {configured}?
+            |  +--:(interface-originated)
+            |  |  +--rw source-interface?
+            |  |          if:interface-ref {interface-designation}?
+            |  +--:(address-originated)
+            |     +--rw source-vrf?
+            |     |       -> /ni:network-instances/network-instance/name
+            |     |       {supports-vrf}?
+            |     +--rw source-address?
+            |             inet:ip-address-no-zone
+            +--rw receivers
+               +--rw receiver* [address port]
+                  +--rw address                   inet:host
+                  +--rw port                      inet:port-number
+                  +--ro pushed-notifications?     yang:counter64
+                  +--ro excluded-notifications?   yang:counter64
+                  +--ro state                     enumeration
+                  +---x reset
+                     +--ro output
+                        +--ro time    yang:date-and-time
+
 
                         Subscriptions tree diagram
-
-
-
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 30]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
 
    Above is a tree diagram for the subscriptions container.  All objects
    contained in this tree are described within the included YANG model
@@ -1705,6 +1678,14 @@ module ietf-subscribed-notifications {
     reference
        "RFC 6991: Common YANG Data Types";
   }
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 30]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
   import ietf-inet-types {
      prefix inet;
      reference
@@ -1734,14 +1715,6 @@ module ietf-subscribed-notifications {
      Author:   Alexander Clemm
                <mailto:ludwig@clemm.org>
 
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 31]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
      Author:   Eric Voit
                <mailto:evoit@cisco.com>
 
@@ -1758,9 +1731,17 @@ Internet-Draft          Subscribed Notifications              March 2018
     "Contains a YANG specification for subscribing to event records
     and receiving matching content within notification messages.";
 
-  revision 2018-03-18 {
+  revision 2018-03-21 {
     description
       "Initial version";
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 31]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
     reference
     "RFC XXXX: Customized Subscriptions to a Publisher's Event Streams";
   }
@@ -1790,14 +1771,6 @@ Internet-Draft          Subscribed Notifications              March 2018
   feature replay {
     description
       "This feature indicates that historical event record replay is
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 32]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
       supported.  With replay, it is possible for past event records to
       be streamed in chronological order.";
   }
@@ -1817,9 +1790,24 @@ Internet-Draft          Subscribed Notifications              March 2018
   feature supports-vrf {
     description
       "This feature indicates a publisher supports VRF configuration
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 32]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
       for configured subscriptions.  VRF support for dynamic
       subscriptions does not require this feature.";
     reference "draft-ietf-rtgwg-ni-model";
+  }
+
+  feature interface-designation {
+    description
+      "This feature indicates a publisher supports sourcing all receiver
+      interactions for a configured subscription from a single
+      designated egress interface.";
   }
 
   feature qos {
@@ -1847,13 +1835,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    * IDENTITIES
    */
 
-
-
-Voit, et al.           Expires September 19, 2018              [Page 33]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
   /* Identities for RPC and Notification errors */
 
   identity establish-subscription-error {
@@ -1865,6 +1846,14 @@ Internet-Draft          Subscribed Notifications              March 2018
   identity modify-subscription-error {
      description
       "Problem found while attempting to fulfill a
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 33]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
       'modify-subscription' rpc request. ";
   }
 
@@ -1902,14 +1891,6 @@ Internet-Draft          Subscribed Notifications              March 2018
   }
 
   identity filter-unsupported {
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 34]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
     base establish-subscription-error;
     base modify-subscription-error;
     description
@@ -1921,6 +1902,14 @@ Internet-Draft          Subscribed Notifications              March 2018
   identity history-unavailable {
     base establish-subscription-error;
     description
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 34]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
      "Replay request too far into the past. This means the publisher
       does store historic information for the requested stream, but
       not back to the requested timestamp.";
@@ -1958,14 +1947,6 @@ Internet-Draft          Subscribed Notifications              March 2018
   identity stream-unavailable {
     base subscription-terminated-reason;
     description
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 35]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
      "Not a subscribable stream.  This means the referenced stream is
       not available for subscription by the receiver.";
   }
@@ -1977,6 +1958,13 @@ Internet-Draft          Subscribed Notifications              March 2018
       has eliminated the subscription as it exceeded a time limit for
       suspension.";
   }
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 35]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
 
   identity unsupportable-volume {
     base subscription-suspended-reason;
@@ -2014,14 +2002,6 @@ Internet-Draft          Subscribed Notifications              March 2018
     description
       "An identity that represents a the underlying mechanism for
       passing notification messages.";
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 36]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
   }
 
   identity netconf {
@@ -2034,6 +2014,14 @@ Internet-Draft          Subscribed Notifications              March 2018
 
   identity http2 {
     base transport;
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 36]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
     description
       "HTTP2 is used a transport for notification messages and state
        change notifications.";
@@ -2070,14 +2058,6 @@ Internet-Draft          Subscribed Notifications              March 2018
     type identityref {
       base encoding;
     }
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 37]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
     description
       "Specifies a data encoding, e.g. for a data subscription.";
   }
@@ -2090,6 +2070,13 @@ Internet-Draft          Subscribed Notifications              March 2018
       "Specifies transport used to send notification messages to a
        receiver.";
   }
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 37]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
 
   typedef stream-ref {
     type leafref {
@@ -2126,14 +2113,6 @@ Internet-Draft          Subscribed Notifications              March 2018
 
           The subtree filter is applied to the representation of
           individual, delineated event records as contained within the
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 38]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
           event stream.  For example, if the notification message
           contains an instance of a notification defined in YANG, then
           the top-level element is the name of the YANG notification.
@@ -2147,6 +2126,14 @@ Internet-Draft          Subscribed Notifications              March 2018
         if-feature "xpath";
         type yang:xpath1.0;
         description
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 38]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
           "Event stream evaluation criteria encoded in the syntax of
            an XPath 1.0 expression.
 
@@ -2183,13 +2170,6 @@ Internet-Draft          Subscribed Notifications              March 2018
     }
   }
 
-
-
-Voit, et al.           Expires September 19, 2018              [Page 39]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
   grouping update-qos {
     description
       "This grouping describes Quality of Service information
@@ -2202,6 +2182,14 @@ Internet-Draft          Subscribed Notifications              March 2018
       description
         "The push update's IP packet transport priority. This is made
          visible across network hops to receiver. The transport
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 39]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
          priority is shared for all receivers of a given subscription.";
     }
     leaf weighting {
@@ -2224,7 +2212,12 @@ Internet-Draft          Subscribed Notifications              March 2018
          has absolute priority should that parent have push updates
          ready to egress the publisher. In other words, there should be
          no streaming of objects from the current subscription if
-         the parent has something ready to push.";
+         the parent has something ready to push.
+
+         If a dependency is asserted via configuration or via RPC, but
+         the referenced subscription-id does not exist, the dependency
+         is silently discarded.  If a referenced subscription is deleted
+         this dependency is removed.";
       reference
         "RFC-7540, section 5.3.1";
     }
@@ -2238,6 +2231,13 @@ Internet-Draft          Subscribed Notifications              March 2018
       mandatory true;
       description
         "Identifies the source of information against which a
+        subscription is being applied, as well as specifics on the
+        subset of information desired from that source.";
+      case stream {
+        choice stream-filter {
+          description
+            "An event stream filter can be applied to a subscription.
+            That filter will come either referenced from a global list,
 
 
 
@@ -2246,13 +2246,6 @@ Voit, et al.           Expires September 19, 2018              [Page 40]
 Internet-Draft          Subscribed Notifications              March 2018
 
 
-        subscription is being applied, as well as specifics on the
-        subset of information desired from that source.";
-      case stream {
-        choice stream-filter {
-          description
-            "An event stream filter can be applied to a subscription.
-            That filter will come either referenced from a global list,
             or be provided within the subscription itself.";
           case by-reference {
             description
@@ -2294,6 +2287,13 @@ Internet-Draft          Subscribed Notifications              March 2018
       type encoding;
       mandatory true;
       description
+        "The type of encoding for the subscribed data.";
+    }
+    uses subscription-policy-modifiable {
+      augment target/stream {
+        description
+          "Adds additional objects which can be modified by RPC.";
+        leaf stream {
 
 
 
@@ -2302,13 +2302,6 @@ Voit, et al.           Expires September 19, 2018              [Page 41]
 Internet-Draft          Subscribed Notifications              March 2018
 
 
-        "The type of encoding for the subscribed data.";
-    }
-    uses subscription-policy-modifiable {
-      augment target/stream {
-        description
-          "Adds additional objects which can be modified by RPC.";
-        leaf stream {
           type stream-ref {
             require-instance false;
           }
@@ -2349,97 +2342,6 @@ Internet-Draft          Subscribed Notifications              March 2018
     uses subscription-policy-dynamic;
   }
 
-  grouping notification-origin-info {
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 42]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
-    description
-      "Defines the sender source from which notification messages for a
-       configured subscription are sent.";
-    choice notification-message-origin {
-      description
-        "Identifies the egress interface on the Publisher from which
-         notification messages are to be sent.";
-      case interface-originated {
-        description
-          "When notification messages to egress a specific, designated
-           interface on the Publisher.";
-        leaf source-interface {
-          type if:interface-ref;
-          description
-            "References the interface for notification messages.";
-        }
-      }
-      case address-originated {
-        description
-          "When notification messages are to depart from a publisher
-             using specfic originating address and/or routing context
-           information.";
-        leaf source-vrf {
-          if-feature "supports-vrf";
-          type leafref {
-            path "/ni:network-instances/ni:network-instance/ni:name";
-          }
-          description
-            "VRF from which notification messages should egress a
-            publisher.";
-        }
-        leaf source-address {
-          type inet:ip-address-no-zone;
-          description
-            "The source address for the notification messages.  If a
-            source VRF exists, but this object doesn't, a publisher's
-            default address for that VRF must be used.";
-        }
-      }
-    }
-  }
-
-  grouping receiver-info {
-    description
-      "Defines where and how to get notification messages for a
-      configured subscriptions to one or more targeted recipient.  This
-      includes specifying the destination addressing as well as a
-      transport acceptable to the receiver.";
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 43]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
-    container receivers {
-      description
-        "Set of receivers in a subscription.";
-      list receiver {
-        key "address port";
-        min-elements 1;
-        description
-          "A single host or multipoint address intended as a target
-           for the notification messages of a subscription.";
-        leaf address {
-          type inet:host;
-          description
-            "Specifies the address for the traffic to reach a remote
-            host. One of the following must be specified: an ipv4
-            address, an ipv6 address, or a host name.";
-        }
-        leaf port {
-          type inet:port-number;
-          description
-            "This leaf specifies the port number to use for messages
-             destined for a receiver.";
-        }
-      }
-    }
-  }
-
 
   /*
    * RPCs
@@ -2448,6 +2350,14 @@ Internet-Draft          Subscribed Notifications              March 2018
   rpc establish-subscription {
     description
       "This RPC allows a subscriber to create (and possibly negotiate)
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 42]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
        a subscription on its own behalf.  If successful, the
        subscription remains in effect for the duration of the
        subscriber's association with the publisher, or until the
@@ -2462,14 +2372,6 @@ Internet-Draft          Subscribed Notifications              March 2018
         refine "encoding" {
           mandatory false;
           description
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 44]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
             "The type of encoding for the subscribed data. If not
             included as part of the RPC, the encoding MUST be set by the
             publisher to be the encoding used by this RPC.";
@@ -2504,6 +2406,14 @@ Internet-Draft          Subscribed Notifications              March 2018
           "Indicates the reason why the subscription has failed to
           be created to a targeted stream.";
         }
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 43]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
       leaf filter-failure-hint {
         type string;
           description
@@ -2518,30 +2428,22 @@ Internet-Draft          Subscribed Notifications              March 2018
             alternate time which may be supportable.";
       }
     }
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 45]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
   }
 
   rpc modify-subscription {
     description
-      "This RPC allows a subscriber to modify a subscription that was
-       previously created using establish-subscription.  If successful,
-       the changed subscription remains in effect for the duration of
-       the subscriber's association with the publisher, or until the
-       subscription is again modified or terminated.  In case of an
-       error or an inability to meet the modified parameters, the
-       subscription is not modified and the original subscription
-       parameters remain in effect.  In that case, the rpc error
-       MAY include error-info suggested parameter hints that would have
-       a high likelihood of succeeding in a subsequent
-       modify-subscription request.  A successful modify-subscription
-       will return a suspended subscription to an active state.";
+      "This RPC allows a subscriber to modify a dynamic subscription's
+       parameters.  If successful, the changed subscription
+       parameters remain in effect for the duration of the subscription,
+       until the subscription is again modified, or until the
+       subscription is terminated.  In case of an error or an inability
+       to meet the modified parameters, the subscription is not modified
+       and the original subscription parameters remain in effect.
+       In that case, the rpc error MAY include error-info suggested
+       parameter hints that would have a high likelihood of succeeding
+       in a subsequent modify-subscription request.  A successful
+       modify-subscription will return a suspended subscription to an
+       active state.";
     input {
       leaf identifier {
         type subscription-id;
@@ -2560,6 +2462,14 @@ Internet-Draft          Subscribed Notifications              March 2018
         error response when there is a failure of a
         'modify-subscription' RPC which has been made against a
         stream.  This yang-data MUST be used if hints are to be
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 44]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
         provides back to the subscriber.";
       leaf reason {
         type identityref {
@@ -2574,14 +2484,6 @@ Internet-Draft          Subscribed Notifications              March 2018
         type string;
           description
             "Information describing where and/or why a provided filter
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 46]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
              was unsupportable for a subscription.";
       }
     }
@@ -2616,6 +2518,14 @@ Internet-Draft          Subscribed Notifications              March 2018
 
        If an error occurs, the server replies with an 'rpc-error' where
        the 'error-info' field MAY contain an 'delete-subscription-error'
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 45]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
        structure.";
     input {
       leaf identifier {
@@ -2630,14 +2540,6 @@ Internet-Draft          Subscribed Notifications              March 2018
   }
 
   rc:yang-data delete-subscription-error {
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 47]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
     container delete-subscription-error {
       description
         "If a 'delete-subscription' RPC or a 'kill-subscription' RPC
@@ -2672,6 +2574,14 @@ Internet-Draft          Subscribed Notifications              March 2018
     leaf identifier {
       type subscription-id;
       mandatory true;
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 46]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
       description
         "This references the affected subscription.";
     }
@@ -2686,14 +2596,6 @@ Internet-Draft          Subscribed Notifications              March 2018
     leaf identifier {
       type subscription-id;
       mandatory true;
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 48]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
       description
         "This references the gracefully completed subscription.";
     }
@@ -2728,6 +2630,14 @@ Internet-Draft          Subscribed Notifications              March 2018
           'stream-filter-ref' is populated, the filter within the
           subscription came from the 'filters' container.  Otherwise it
           is populated in-line as part of the subscription.";
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 47]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
       }
     }
   }
@@ -2742,14 +2652,6 @@ Internet-Draft          Subscribed Notifications              March 2018
        time event records have been sent.";
     leaf identifier {
       type subscription-id;
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 49]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
       mandatory true;
       description
         "This references the affected subscription.";
@@ -2784,6 +2686,14 @@ Internet-Draft          Subscribed Notifications              March 2018
   notification subscription-terminated {
     sn:subscription-state-notification;
     description
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 48]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
       "This notification indicates that a subscription has been
        terminated.";
     leaf identifier {
@@ -2798,14 +2708,6 @@ Internet-Draft          Subscribed Notifications              March 2018
       }
       mandatory true;
       description
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 50]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
         "Identifies the condition which resulted in the termination .";
     }
   }
@@ -2840,6 +2742,14 @@ Internet-Draft          Subscribed Notifications              March 2018
    */
 
   container streams {
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 49]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
     config false;
     description
       "This container contains information on the built-in streams
@@ -2854,14 +2764,6 @@ Internet-Draft          Subscribed Notifications              March 2018
         description
           "A handle for a system-provided stream made up of a
           sequential set of event records, each of which is
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 51]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
           characterized by its own domain and semantics.";
       }
       leaf description {
@@ -2896,6 +2798,14 @@ Internet-Draft          Subscribed Notifications              March 2018
           "The timestamp of the last event record aged out of the log.
           This object MUST be present if replay is supported and any
           event record have been aged out of the log.";
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 50]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
       }
     }
   }
@@ -2910,14 +2820,6 @@ Internet-Draft          Subscribed Notifications              March 2018
       description
         "A list of pre-positioned filters that can be applied to
         subscriptions.";
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 52]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
       leaf identifier {
         type filter-id;
         description
@@ -2939,7 +2841,11 @@ Internet-Draft          Subscribed Notifications              March 2018
       description
         "The identity and specific parameters of a subscription.
          Subscriptions within this list can be created using a control
-         channel or RPC, or be established through configuration.";
+         channel or RPC, or be established through configuration.
+
+         If configuration operations or the 'kill-subscription' rpc are
+         used to delete a subscription, a 'subscription-terminated'
+         message is sent to any ACTIVE or SUSPENDED receivers.";
       leaf identifier {
         type subscription-id;
         description
@@ -2948,6 +2854,14 @@ Internet-Draft          Subscribed Notifications              March 2018
       leaf configured-subscription-state {
         if-feature "configured";
         type enumeration {
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 51]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
           enum valid {
             value 1;
             description
@@ -2966,14 +2880,6 @@ Internet-Draft          Subscribed Notifications              March 2018
                 but not yet been removed from configuration.";
           }
         }
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 53]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
         config false;
         description
           "The presence of this leaf indicates that the subscription
@@ -3000,20 +2906,90 @@ Internet-Draft          Subscribed Notifications              March 2018
             subscription to the 'invalid' state.";
         }
       }
-      uses notification-origin-info {
+      choice notification-message-origin {
         if-feature "configured";
-      }
-      uses receiver-info {
-        augment receivers/receiver {
+        description
+          "Identifies the egress interface on the Publisher from which
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 52]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
+           notification messages are to be sent.";
+        case interface-originated {
           description
-            "include operational data for receivers.";
+            "When notification messages to egress a specific, designated
+             interface on the Publisher.";
+          leaf source-interface {
+            if-feature "interface-designation";
+            type if:interface-ref;
+            description
+              "References the interface for notification messages.";
+          }
+        }
+        case address-originated {
+          description
+            "When notification messages are to depart from a publisher
+             using specfic originating address and/or routing context
+             information.";
+          leaf source-vrf {
+            if-feature "supports-vrf";
+            type leafref {
+              path "/ni:network-instances/ni:network-instance/ni:name";
+            }
+            description
+              "VRF from which notification messages should egress a
+              publisher.";
+          }
+          leaf source-address {
+            type inet:ip-address-no-zone;
+            description
+              "The source address for the notification messages.  If a
+              source VRF exists, but this object doesn't, a publisher's
+              default address for that VRF must be used.";
+          }
+        }
+      }
+      container receivers {
+        description
+          "Set of receivers in a subscription.";
+        list receiver {
+          key "address port";
+          min-elements 1;
+          description
+            "A single host or multipoint address intended as a target
+             for the notification messages of a subscription.";
+          leaf address {
+            type inet:host;
+            description
+              "Specifies the address for the traffic to reach a remote
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 53]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
+              host. One of the following must be specified: an ipv4
+              address, an ipv6 address, or a host name.";
+          }
+          leaf port {
+            type inet:port-number;
+            description
+              "This leaf specifies the port number to use for messages
+               destined for a receiver.";
+          }
           leaf pushed-notifications {
             type yang:counter64;
             config false;
             description
               "Operational data which provides the number of update
                notification messages pushed to a receiver.";
-            }
+          }
           leaf excluded-notifications {
             type yang:counter64;
             config false;
@@ -3022,6 +2998,30 @@ Internet-Draft          Subscribed Notifications              March 2018
                records from a stream explicitly removed either via a
                stream filter or an access control filter so that they
                are not passed to a receiver.";
+          }
+          leaf state {
+            type enumeration {
+              enum active {
+                value 1;
+                description
+                  "Receiver is currently being sent any applicable
+                  notification messages for the subscription.";
+            }
+            enum suspended {
+              value 2;
+              description
+                "Receiver state is suspended, so the publisher
+                is currently unable to provide notification messages
+                for the subscription.";
+            }
+            enum connecting {
+              value 3;
+              if-feature "configured";
+              description
+                "A subscription has been configured, but a
+                subscription-started state change notification needs
+                to be successfully received before notification
+                messages are sent.
 
 
 
@@ -3030,62 +3030,33 @@ Voit, et al.           Expires September 19, 2018              [Page 54]
 Internet-Draft          Subscribed Notifications              March 2018
 
 
+                If the 'reset' action is invoked for a receiver of an
+                active configured subscription, the state must be
+                moved to connecting.";
             }
-          leaf state {
-            type enumeration {
-              enum active {
-                value 1;
-                description
-                  "Receiver is currently being sent any applicable
-                  notification messages for the subscription.";
-              }
-              enum suspended {
-                value 2;
-                description
-                  "Receiver state is suspended, so the publisher
-                  is currently unable to provide notification messages
-                  for the subscription.";
-              }
-              enum connecting {
-                value 3;
-                if-feature "configured";
-                description
-                  "A subscription has been configured, but a
-                  subscription-started state change notification needs
-                  to be successfully received before notification
-                  messages are sent.";
-              }
-              enum timeout {
-                value 4;
-                if-feature "configured";
-                description
-                  "A subscription has failed in sending a subscription
-                  started state change to the receiver.
-                  Additional attempts at connection attempts are not
-                  currently being made.";
-              }
+            enum timeout {
+              value 4;
+              if-feature "configured";
+              description
+                "A subscription has failed in sending a subscription
+                started state change to the receiver.
+                Additional attempts at connection attempts are not
+                currently being made.";
             }
-            config false;
-            mandatory true;
-            description
-              "Specifies the state of a subscription from the
-              perspective of a particular receiver.  With this info it
-              is possible to determine whether a subscriber is currently
-              generating notification messages intended for that
-              receiver.";
+          }
+          config false;
+          mandatory true;
+          description
+            "Specifies the state of a subscription from the
+            perspective of a particular receiver.  With this info it
+            is possible to determine whether a subscriber is currently
+            generating notification messages intended for that
+            receiver.";
           }
           action reset {
             description
               "Allows the reset of this configured subscription receiver
               to the 'connecting' state. This enables the
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 55]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
               connection process to be re-initiated.";
             output {
               leaf time {
@@ -3103,6 +3074,17 @@ Internet-Draft          Subscribed Notifications              March 2018
   }
 }
 <CODE ENDS>
+
+
+
+
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 55]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
 
 5.  Considerations
 
@@ -3135,13 +3117,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    results, it is useful to use the subscription identifier handle
    across the receivers to allow that correlation.
 
-
-
-Voit, et al.           Expires September 19, 2018              [Page 56]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
 5.2.  IANA Considerations
 
    This document registers the following namespace URI in the "IETF XML
@@ -3159,6 +3134,13 @@ Internet-Draft          Subscribed Notifications              March 2018
    Prefix: sn
    Reference: draft-ietf-netconf-ietf-subscribed-notifications-11.txt
    (RFC form)
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 56]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
 
 5.3.  Security Considerations
 
@@ -3191,13 +3173,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    o  stream-xpath-filter: updating a filter could increase the
       computational complexity of all referencing subscriptions.
 
-
-
-Voit, et al.           Expires September 19, 2018              [Page 57]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
    Container: subscriptions
 
    o  address: can be used to attempt to send traffic to an unwilling
@@ -3215,6 +3190,13 @@ Internet-Draft          Subscribed Notifications              March 2018
       another entity.
 
    o  port: none
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 57]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
 
    o  transport: none
 
@@ -3246,14 +3228,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    o  weighting: placing a large weight can overwhelm the dequeuing of
       other subscriptions.
 
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 58]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
    Some of the readable data nodes in this YANG module may be considered
    sensitive or vulnerable in some network environments.  It is thus
    important to control read access (e.g., via get, get-config, or
@@ -3270,6 +3244,15 @@ Internet-Draft          Subscribed Notifications              March 2018
       expose logs to those who should have no access.
 
    Container: subscriptions
+
+
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 58]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
 
    o  pushed-notifications: will show the amount of events a particular
       subscriber actually received from a stream.
@@ -3303,13 +3286,6 @@ Internet-Draft          Subscribed Notifications              March 2018
 
    RPC: kill-subscription
 
-
-
-Voit, et al.           Expires September 19, 2018              [Page 59]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
    o  The "kill-subscription" RPC MUST be secured so that only
       connections with administrative rights are able to invoke this
       RPC.
@@ -3326,6 +3302,14 @@ Internet-Draft          Subscribed Notifications              March 2018
 
    A secure transport is highly recommended and the publisher MUST
    ensure that the receiver has sufficient authorization to perform the
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 59]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
    function they are requesting against the specific subset of content
    involved.
 
@@ -3357,15 +3341,6 @@ Internet-Draft          Subscribed Notifications              March 2018
               Architecture", draft-ietf-netmod-revised-datastores-10
               (work in progress), February 2018.
 
-
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 60]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
-
    [I-D.draft-ietf-rtgwg-ni-model]
               Berger, L., Hopps, C., and A. Lindem, "YANG Network
               Instances", draft-ietf-rtgwg-ni-model-06 (work in
@@ -3384,15 +3359,17 @@ Internet-Draft          Subscribed Notifications              March 2018
               Notifications", RFC 5277, DOI 10.17487/RFC5277, July 2008,
               <https://www.rfc-editor.org/info/rfc5277>.
 
+
+
+Voit, et al.           Expires September 19, 2018              [Page 60]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
    [RFC6020]  Bjorklund, M., Ed., "YANG - A Data Modeling Language for
               the Network Configuration Protocol (NETCONF)", RFC 6020,
               DOI 10.17487/RFC6020, October 2010,
               <https://www.rfc-editor.org/info/rfc6020>.
-
-   [RFC7540]  Belshe, M., Peon, R., and M. Thomson, Ed., "Hypertext
-              Transfer Protocol Version 2 (HTTP/2)", RFC 7540,
-              DOI 10.17487/RFC7540, May 2015,
-              <https://www.rfc-editor.org/info/rfc7540>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
@@ -3408,19 +3385,6 @@ Internet-Draft          Subscribed Notifications              March 2018
               <http://www.w3.org/TR/1999/REC-xpath-19991116>.
 
 7.2.  Informative References
-
-
-
-
-
-
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 61]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
 
    [I-D.draft-ietf-netconf-netconf-event-notifications]
               Clemm, Alexander., Voit, Eric., Gonzalez Prieto, Alberto.,
@@ -3448,11 +3412,15 @@ Internet-Draft          Subscribed Notifications              March 2018
               ietf-netmod-yang-tree-diagrams-06 (work in progress),
               February 2018.
 
-   [I.D.draft-ietf-netconf-notification-messages]
-              Voit, Eric., Clemm, Alexander., Bierman, A., and T.
-              Jenkins, "YANG Notification Headers and Bundles",
-              September 2017, <https://datatracker.ietf.org/doc/
-              draft-ietf-netconf-notification-messages>.
+
+
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 61]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
 
    [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
               (TLS) Protocol Version 1.2", RFC 5246,
@@ -3467,16 +3435,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    [RFC6242]  Wasserman, M., "Using the NETCONF Protocol over Secure
               Shell (SSH)", RFC 6242, DOI 10.17487/RFC6242, June 2011,
               <https://www.rfc-editor.org/info/rfc6242>.
-
-
-
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 62]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
 
    [RFC7923]  Voit, E., Clemm, A., and A. Gonzalez Prieto, "Requirements
               for Subscription to YANG Datastores", RFC 7923,
@@ -3512,11 +3470,24 @@ Appendix A.  Changes between revisions
 
    o  reference numbers placed into state machine figures
 
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 62]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
    o  Broke configured replay into its own section
 
-   o  Minor updates based on LC reviews
+   o  Many tweaks updates based on LC and YANG doctor reviews
 
    o  Trees and YANG model reconciled were deltas existed
+
+   o  New feature for interface originated.
+
+   o  YANG model updates to collapse once used groups under
+      'subscriptions'.
 
    v09 - v10
 
@@ -3526,13 +3497,6 @@ Appendix A.  Changes between revisions
 
    o  NMDA model supported.  Non NMDA version at https://github.com/
       netconf-wg/rfc5277bis/
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 63]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
 
    o  Error mechanism revamped to match to embedded implementations.
 
@@ -3562,6 +3526,14 @@ Internet-Draft          Subscribed Notifications              March 2018
       Most significant of these are Stream returned to string (with the
       SYSLOG identity removed), intro section on 5277 relationship, an
       identity set moved to an enumeration, clean up of definitions/
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 63]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
       terminology, state machine proposed for configured subscriptions
       with a clean-up of subscription state options.
 
@@ -3581,14 +3553,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    o  Returned to the explicit filter subtyping of v00
 
    o  stream object changed to 'name' from 'stream'
-
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 64]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
 
    o  Cleaned up examples
 
@@ -3618,6 +3582,14 @@ Internet-Draft          Subscribed Notifications              March 2018
 
    o  Subscription status moved under receiver.
 
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 64]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
    v00 - v01
 
    o  Security considerations updated
@@ -3637,14 +3609,6 @@ Internet-Draft          Subscribed Notifications              March 2018
       datastores
 
    o  Enabled notification timestamp to have different formats.
-
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 65]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
 
    o  Two error codes added.
 
@@ -3673,6 +3637,15 @@ Internet-Draft          Subscribed Notifications              March 2018
    o  Control plane notification renamed to subscription state
       notification
 
+
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 65]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
    o  Source address: Source-vrf changed to string, default address
       option added
 
@@ -3693,14 +3666,6 @@ Internet-Draft          Subscribed Notifications              March 2018
    o  Removal of redundancy with other drafts
 
    o  Many other clean-ups of wording and terminology
-
-
-
-
-Voit, et al.           Expires September 19, 2018              [Page 66]
-
-Internet-Draft          Subscribed Notifications              March 2018
-
 
 Authors' Addresses
 
@@ -3728,6 +3693,15 @@ Authors' Addresses
    Email: einarnn@cisco.com
 
 
+
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 66]
+
+Internet-Draft          Subscribed Notifications              March 2018
+
+
    Ambika Prasad Tripathy
    Cisco Systems
 
@@ -3752,3 +3726,31 @@ Authors' Addresses
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Voit, et al.           Expires September 19, 2018              [Page 67]
