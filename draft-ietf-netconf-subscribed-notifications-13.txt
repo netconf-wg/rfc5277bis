@@ -2,6 +2,10 @@ PRE-DRAFT:  April 19 2018
 *************************
 
 
+
+
+
+
 NETCONF                                                          E. Voit
 Internet-Draft                                             Cisco Systems
 Intended status: Standards Track                                A. Clemm
@@ -87,7 +91,7 @@ Table of Contents
      3.2.  Filters Container . . . . . . . . . . . . . . . . . . . .  31
      3.3.  Subscriptions Container . . . . . . . . . . . . . . . . .  31
    4.  Data Model  . . . . . . . . . . . . . . . . . . . . . . . . .  32
-   5.  Considerations  . . . . . . . . . . . . . . . . . . . . . . .  58
+   5.  Considerations  . . . . . . . . . . . . . . . . . . . . . . .  59
      5.1.  Implementation Considerations . . . . . . . . . . . . . .  59
      5.2.  IANA Considerations . . . . . . . . . . . . . . . . . . .  59
      5.3.  Security Considerations . . . . . . . . . . . . . . . . .  60
@@ -1800,7 +1804,7 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    [ note to the RFC Editor - please replace the two dates within the
    YANG module with the date of publication ]
-   
+
 <CODE BEGINS> file "ietf-subscribed-notifications@2018-04-19.yang"
 module ietf-subscribed-notifications {
   yang-version 1.1;
@@ -1864,7 +1868,19 @@ Internet-Draft          Subscribed Notifications              April 2018
 
   description
     "Contains a YANG specification for subscribing to event records
-    and receiving matching content within notification messages.";
+    and receiving matching content within notification messages.
+
+    Copyright (c) 2018 IETF Trust and the persons identified as authors
+    of the code.  All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, is permitted pursuant to, and subject to the license
+    terms contained in, the Simplified BSD License set forth in Section
+    4.c of the IETF Trust's Legal Provisions Relating to IETF Documents
+    (https://trustee.ietf.org/license-info).
+
+    This version of this YANG module is part of RFC XXXX; see the RFC
+    itself for full legal notices.";
 
   revision 2018-04-19 {
     description
@@ -1886,6 +1902,14 @@ Internet-Draft          Subscribed Notifications              April 2018
   feature dscp {
     description
       "This feature indicates a publisher supports the placement of
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 34]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
       suggested prioritization levels for network transport within
       notification messages.";
   }
@@ -1898,14 +1922,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
   feature encode-xml {
     description
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 34]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
       "This feature indicates that XML encoding of notification
        messages is supported.";
   }
@@ -1942,6 +1958,14 @@ Internet-Draft          Subscribed Notifications              April 2018
 
   feature supports-vrf {
     description
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 35]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
       "This feature indicates a publisher supports VRF configuration
       for configured subscriptions.  VRF support for dynamic
       subscriptions does not require this feature.";
@@ -1953,14 +1977,6 @@ Internet-Draft          Subscribed Notifications              April 2018
       "This feature indicates support for xpath filtering.";
     reference "http://www.w3.org/TR/1999/REC-xpath-19991116";
   }
-
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 35]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
   /*
    * EXTENSIONS
@@ -1998,6 +2014,14 @@ Internet-Draft          Subscribed Notifications              April 2018
   identity modify-subscription-error {
      description
       "Problem found while attempting to fulfill a
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 36]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
       'modify-subscription' RPC request.";
   }
 
@@ -2010,14 +2034,6 @@ Internet-Draft          Subscribed Notifications              April 2018
   identity subscription-terminated-reason {
      description
       "Problem condition communicated to a receiver as part of a
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 36]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
       'subscription-terminated' notification.";
   }
 
@@ -2054,6 +2070,14 @@ Internet-Draft          Subscribed Notifications              April 2018
      "Replay request too far into the past. This means the publisher
       does store historic information for the requested stream, but
       not back to the requested timestamp.";
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 37]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
   }
 
   identity insufficient-resources {
@@ -2066,13 +2090,6 @@ Internet-Draft          Subscribed Notifications              April 2018
        is too limited to generate the desired set of notification
        messages.";
   }
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 37]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
   identity no-such-subscription {
     base modify-subscription-error;
@@ -2109,6 +2126,14 @@ Internet-Draft          Subscribed Notifications              April 2018
   }
 
   identity unsupportable-volume {
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 38]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
     base subscription-suspended-reason;
     description
       "The publisher does not have the network bandwidth needed to get
@@ -2122,13 +2147,6 @@ Internet-Draft          Subscribed Notifications              April 2018
       "If a transport identity derives from this identity, it means
        that it supports configurable encodings.";
   }
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 38]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
   identity encoding {
     description
@@ -2164,6 +2182,14 @@ Internet-Draft          Subscribed Notifications              April 2018
     description
       "A transport identity can derive from this identity in order to
        allow inline definition of the host address in the
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 39]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
        'receiver' list";
   }
 
@@ -2178,13 +2204,6 @@ Internet-Draft          Subscribed Notifications              April 2018
     description
       "Specifies a data encoding, e.g. for a data subscription.";
   }
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 39]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
   typedef filter-id {
     type string;
@@ -2219,6 +2238,14 @@ Internet-Draft          Subscribed Notifications              April 2018
     type identityref {
       base transport;
     }
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 40]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
     description
       "Specifies transport used to send notification messages to a
        receiver.";
@@ -2234,14 +2261,6 @@ Internet-Draft          Subscribed Notifications              April 2018
        streams.";
     choice filter-spec {
       description
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 40]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
         "The content filter specification for this request.";
       anydata stream-subtree-filter {
         if-feature "subtree";
@@ -2275,6 +2294,14 @@ Internet-Draft          Subscribed Notifications              April 2018
            notification, and the root node has this top-level element
            as the only child.
 
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 41]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
            The result of the XPath expression is converted to a
            boolean value using the standard XPath 1.0 rules.  If the
            boolean value is 'true', the filter matches the event record,
@@ -2290,13 +2317,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
              o  The function library is the core function library, and
                 the XPath functions defined in section 10 in RFC 7950.
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 41]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
              o  The context node is the root node.";
         reference
@@ -2330,6 +2350,14 @@ Internet-Draft          Subscribed Notifications              April 2018
       description
         "Relative weighting for a subscription. Allows an underlying
          transport layer perform informed load balance allocations
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 42]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
          between various subscriptions";
       reference
         "RFC-7540, section 5.3.2";
@@ -2346,14 +2374,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
          If a dependency is asserted via configuration or via RPC, but
          the referenced 'subscription-id' does not exist, the dependency
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 42]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
          is silently discarded.  If a referenced subscription is deleted
          this dependency is removed.";
       reference
@@ -2386,6 +2406,14 @@ Internet-Draft          Subscribed Notifications              April 2018
               description
                 "References an existing stream filter which is to
                 be applied to an event stream for the subscription.";
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 43]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
             }
           }
           case within-subscription {
@@ -2402,14 +2430,6 @@ Internet-Draft          Subscribed Notifications              April 2018
       description
         "Identifies a time after which notification messages for a
         subscription should not be sent.  If 'stop-time' is not present,
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 43]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
         the notification messages will continue until the subscription
         is terminated.  If 'replay-start-time' exists, 'stop-time' must
         be for a subsequent time. If 'replay-start-time' doesn't exist,
@@ -2442,6 +2462,14 @@ Internet-Draft          Subscribed Notifications              April 2018
             "Used to trigger the replay feature and indicate that the
             replay should start at the time specified.  If
             'replay-start-time' is not present, this is not a replay
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 44]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
             subscription and event record push should start immediately.
             It is never valid to specify start times that are later than
             or equal to the current time.";
@@ -2458,14 +2486,6 @@ Internet-Draft          Subscribed Notifications              April 2018
       exclusion of both receivers and networking information specific to
       the publisher such as what interface should be used to transmit
       notification messages.";
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 44]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
     uses subscription-policy-dynamic;
     leaf transport {
       if-feature "configured";
@@ -2498,6 +2518,14 @@ Internet-Draft          Subscribed Notifications              April 2018
 
   rpc establish-subscription {
     description
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 45]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
       "This RPC allows a subscriber to create (and possibly negotiate)
        a subscription on its own behalf.  If successful, the
        subscription remains in effect for the duration of the
@@ -2514,14 +2542,6 @@ Internet-Draft          Subscribed Notifications              April 2018
         type encoding;
         description
           "The type of encoding for the subscribed data. If not
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 45]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
           included as part of the RPC, the encoding MUST be set by the
           publisher to be the encoding used by this RPC.";
       }
@@ -2554,6 +2574,14 @@ Internet-Draft          Subscribed Notifications              April 2018
     container establish-subscription-stream-error-info {
       description
         "If any 'establish-subscription' RPC parameters are
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 46]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
         unsupportable against the event stream, a subscription is not
         created and the RPC error response MUST indicate the reason
         why the subscription failed to be created. This yang-data MAY be
@@ -2570,14 +2598,6 @@ Internet-Draft          Subscribed Notifications              April 2018
         }
       leaf filter-failure-hint {
         type string;
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 46]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
           description
             "Information describing where and/or why a provided filter
              was unsupportable for a subscription.";
@@ -2610,6 +2630,14 @@ Internet-Draft          Subscribed Notifications              April 2018
     }
   }
 
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 47]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
   rc:yang-data modify-subscription-stream-error-info {
     container modify-subscription-stream-error-info {
       description
@@ -2626,14 +2654,6 @@ Internet-Draft          Subscribed Notifications              April 2018
           "Information in a 'modify-subscription' RPC error response
           which indicates the reason why the subscription to an event
           stream has failed to be modified.";
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 47]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
       }
       leaf filter-failure-hint {
         type string;
@@ -2666,6 +2686,14 @@ Internet-Draft          Subscribed Notifications              April 2018
     }
   }
 
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 48]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
   rpc kill-subscription {
     description
       "This RPC allows an operator to delete a dynamic subscription
@@ -2682,14 +2710,6 @@ Internet-Draft          Subscribed Notifications              April 2018
         description
           "Identifier of the subscription that is to be deleted. Only
            subscriptions that were created using
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 48]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
            'establish-subscription' can be deleted via this RPC.";
       }
     }
@@ -2722,6 +2742,14 @@ Internet-Draft          Subscribed Notifications              April 2018
 
   notification replay-completed {
     sn:subscription-state-notification;
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 49]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
     if-feature "replay";
     description
       "This notification is sent to indicate that all of the replay
@@ -2738,14 +2766,6 @@ Internet-Draft          Subscribed Notifications              April 2018
   notification subscription-completed {
     sn:subscription-state-notification;
     if-feature "configured";
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 49]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
     description
       "This notification is sent to indicate that a subscription has
        finished passing event records, as the 'stop-time' has been
@@ -2778,6 +2798,14 @@ Internet-Draft          Subscribed Notifications              April 2018
           "Filter applied to the subscription.  If the
           'stream-filter-ref' is populated, the filter within the
           subscription came from the 'filters' container.  Otherwise it
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 50]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
           is populated in-line as part of the subscription.";
       }
     }
@@ -2794,14 +2822,6 @@ Internet-Draft          Subscribed Notifications              April 2018
     leaf identifier {
       type subscription-id;
       mandatory true;
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 50]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
       description
         "This references the affected subscription.";
     }
@@ -2834,6 +2854,14 @@ Internet-Draft          Subscribed Notifications              April 2018
         description
           "Filter applied to the subscription.  If the
           'stream-filter-ref' is populated, the filter within the
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 51]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
           subscription came from the 'filters' container.  Otherwise it
           is populated in-line as part of the subscription.";
       }
@@ -2850,14 +2878,6 @@ Internet-Draft          Subscribed Notifications              April 2018
        subscription; it does not constitute a general-purpose
        notification.";
     leaf identifier {
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 51]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
       type subscription-id;
       mandatory true;
       description
@@ -2890,6 +2910,14 @@ Internet-Draft          Subscribed Notifications              April 2018
       }
       mandatory true;
       description
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 52]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
         "Identifies the condition which resulted in the termination .";
     }
   }
@@ -2906,14 +2934,6 @@ Internet-Draft          Subscribed Notifications              April 2018
       provided by the publisher.";
     list stream {
       key "name";
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 52]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
       description
         "Identifies the built-in event streams that are supported by the
          publisher.";
@@ -2946,6 +2966,14 @@ Internet-Draft          Subscribed Notifications              April 2018
         mandatory true;
         description
           "The timestamp of the creation of the log used to support the
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 53]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
           replay function on this stream. This time might be earlier
           than the earliest available information contained in the log.
           This object is updated if the log resets for some reason.";
@@ -2962,14 +2990,6 @@ Internet-Draft          Subscribed Notifications              April 2018
            have been aged out of the log.";
       }
     }
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 53]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
   }
 
   container filters {
@@ -3002,6 +3022,14 @@ Internet-Draft          Subscribed Notifications              April 2018
       key "identifier";
       description
         "The identity and specific parameters of a subscription.
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 54]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
          Subscriptions within this list can be created using a control
          channel or RPC, or be established through configuration.
 
@@ -3018,14 +3046,6 @@ Internet-Draft          Subscribed Notifications              April 2018
           description
             "Indicates the event stream to be considered for this
             subscription.  If an event stream has been removed,
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 54]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
             and no longer can be referenced by an active subscription,
             send a 'subscription-terminated' notification with
             'stream-unavailable' as the reason.  If a configured
@@ -3058,6 +3078,14 @@ Internet-Draft          Subscribed Notifications              April 2018
             if-feature "supports-vrf";
             type leafref {
               path "/ni:network-instances/ni:network-instance/ni:name";
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 55]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
             }
             description
               "VRF from which notification messages should egress a
@@ -3074,14 +3102,6 @@ Internet-Draft          Subscribed Notifications              April 2018
       }
       leaf configured-subscription-state {
         if-feature "configured";
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 55]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
         type enumeration {
           enum VALID {
             value 1;
@@ -3114,6 +3134,14 @@ Internet-Draft          Subscribed Notifications              April 2018
         list receiver {
           key "name";
           min-elements 1;
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 56]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
           description
             "A host intended as a recipient for the notification
             messages of a subscription.  For configured subscriptions
@@ -3130,14 +3158,6 @@ Internet-Draft          Subscribed Notifications              April 2018
               'derived-from(../../../transport, "sn:inline-address")';
             type inet:host;
             description
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 56]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
               "Specifies the address for the traffic to reach a remote
               host using the subscription's transport. One of the
               following must be specified: an ipv4 address, an ipv6
@@ -3170,6 +3190,14 @@ Internet-Draft          Subscribed Notifications              April 2018
               enum SUSPENDED {
                 value 2;
                 description
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 57]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
                   "Receiver state is 'SUSPENDED', so the publisher
                   is currently unable to provide notification messages
                   for the subscription.";
@@ -3186,14 +3214,6 @@ Internet-Draft          Subscribed Notifications              April 2018
                   If the 'reset' action is invoked for a receiver of an
                   active configured subscription, the state must be
                   moved to 'CONNECTING'.";
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 57]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
               }
               enum TIMEOUT {
                 value 4;
@@ -3226,6 +3246,14 @@ Internet-Draft          Subscribed Notifications              April 2018
                 mandatory true;
                 description
                   "Time a publisher returned the receiver to a
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 58]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
                   'CONNECTING' state.";
               }
             }
@@ -3238,17 +3266,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 <CODE ENDS>
 
 5.  Considerations
-
-
-
-
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 58]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
 5.1.  Implementation Considerations
 
@@ -3285,6 +3302,14 @@ Internet-Draft          Subscribed Notifications              April 2018
    Registrant Contact: The IESG.
    XML: N/A; the requested URI is an XML namespace.
 
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 59]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    This document registers the following YANG module in the "YANG Module
    Names" registry [RFC6020]:
 
@@ -3293,18 +3318,6 @@ Internet-Draft          Subscribed Notifications              April 2018
    Prefix: sn
    Reference: draft-ietf-netconf-ietf-subscribed-notifications-11.txt
    (RFC form)
-
-
-
-
-
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 59]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
 5.3.  Security Considerations
 
@@ -3345,6 +3358,14 @@ Internet-Draft          Subscribed Notifications              April 2018
    o  "address": can be used to attempt to send traffic to an unwilling
       receiver.
 
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 60]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    o  "dependency": can be used to force important traffic to be queued
       behind less important updates.
 
@@ -3353,14 +3374,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    o  "identifier": can overwrite an existing subscription, perhaps one
       configured by another entity.
-
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 60]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    o  "replay-start-time": can be used to push very large logs, wasting
       resources.
@@ -3400,15 +3413,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    Container: "/streams"
 
-   o  "name": if access control is not properly configured, can expose
-      system internals to those who should have no access to this
-      information.
-
-   o  "replay-support": if access control is not properly configured,
-      can expose logs to those who should have no access.
-
-   Container: "/subscriptions"
-
 
 
 
@@ -3417,6 +3421,15 @@ Voit, et al.            Expires October 21, 2018               [Page 61]
 
 Internet-Draft          Subscribed Notifications              April 2018
 
+
+   o  "name": if access control is not properly configured, can expose
+      system internals to those who should have no access to this
+      information.
+
+   o  "replay-support": if access control is not properly configured,
+      can expose logs to those who should have no access.
+
+   Container: "/subscriptions"
 
    o  "excluded-notifications": leaf can provide information about
       filtered event records.  A network operator should have
@@ -3458,6 +3471,13 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    RPC: "modify-subscription"
 
+
+
+Voit, et al.            Expires October 21, 2018               [Page 62]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    o  Subscriptions could overload a publisher's resources.  For this
       reason, publishers MUST ensure that they have sufficient resources
       to fulfill this request or otherwise reject the request.
@@ -3465,14 +3485,6 @@ Internet-Draft          Subscribed Notifications              April 2018
    For both configured and dynamic subscriptions the publisher MUST
    authenticate and authorize a receiver via some transport level
    mechanism before sending any updates.
-
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 62]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    A secure transport is highly recommended and the publisher MUST
    ensure that the receiver has sufficient authorization to perform the
@@ -3511,15 +3523,7 @@ Internet-Draft          Subscribed Notifications              April 2018
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/info/rfc2119>.
 
-   [RFC2474]  Nichols, K., Blake, S., Baker, F., and D. Black,
-              "Definition of the Differentiated Services Field (DS
-              Field) in the IPv4 and IPv6 Headers", RFC 2474,
-              DOI 10.17487/RFC2474, December 1998,
-              <https://www.rfc-editor.org/info/rfc2474>.
 
-   [RFC3688]  Mealling, M., "The IETF XML Registry", BCP 81, RFC 3688,
-              DOI 10.17487/RFC3688, January 2004,
-              <https://www.rfc-editor.org/info/rfc3688>.
 
 
 
@@ -3529,6 +3533,16 @@ Voit, et al.            Expires October 21, 2018               [Page 63]
 
 Internet-Draft          Subscribed Notifications              April 2018
 
+
+   [RFC2474]  Nichols, K., Blake, S., Baker, F., and D. Black,
+              "Definition of the Differentiated Services Field (DS
+              Field) in the IPv4 and IPv6 Headers", RFC 2474,
+              DOI 10.17487/RFC2474, December 1998,
+              <https://www.rfc-editor.org/info/rfc2474>.
+
+   [RFC3688]  Mealling, M., "The IETF XML Registry", BCP 81, RFC 3688,
+              DOI 10.17487/RFC3688, January 2004,
+              <https://www.rfc-editor.org/info/rfc3688>.
 
    [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
               (TLS) Protocol Version 1.2", RFC 5246,
@@ -3569,6 +3583,13 @@ Internet-Draft          Subscribed Notifications              April 2018
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
+
+
+Voit, et al.            Expires October 21, 2018               [Page 64]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    [RFC8341]  Bierman, A. and M. Bjorklund, "Network Configuration
               Access Control Model", STD 91, RFC 8341,
               DOI 10.17487/RFC8341, March 2018,
@@ -3578,13 +3599,6 @@ Internet-Draft          Subscribed Notifications              April 2018
               and R. Wilton, "Network Management Datastore Architecture
               (NMDA)", RFC 8342, DOI 10.17487/RFC8342, March 2018,
               <https://www.rfc-editor.org/info/rfc8342>.
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 64]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    [RFC8343]  Bjorklund, M., "A YANG Data Model for Interface
               Management", RFC 8343, DOI 10.17487/RFC8343, March 2018,
@@ -3622,16 +3636,6 @@ Internet-Draft          Subscribed Notifications              April 2018
               ietf-netmod-yang-tree-diagrams-06 (work in progress),
               February 2018.
 
-   [RFC7540]  Belshe, M., Peon, R., and M. Thomson, Ed., "Hypertext
-              Transfer Protocol Version 2 (HTTP/2)", RFC 7540,
-              DOI 10.17487/RFC7540, May 2015,
-              <https://www.rfc-editor.org/info/rfc7540>.
-
-   [RFC7923]  Voit, E., Clemm, A., and A. Gonzalez Prieto, "Requirements
-              for Subscription to YANG Datastores", RFC 7923,
-              DOI 10.17487/RFC7923, June 2016,
-              <https://www.rfc-editor.org/info/rfc7923>.
-
 
 
 
@@ -3641,6 +3645,16 @@ Voit, et al.            Expires October 21, 2018               [Page 65]
 
 Internet-Draft          Subscribed Notifications              April 2018
 
+
+   [RFC7540]  Belshe, M., Peon, R., and M. Thomson, Ed., "Hypertext
+              Transfer Protocol Version 2 (HTTP/2)", RFC 7540,
+              DOI 10.17487/RFC7540, May 2015,
+              <https://www.rfc-editor.org/info/rfc7540>.
+
+   [RFC7923]  Voit, E., Clemm, A., and A. Gonzalez Prieto, "Requirements
+              for Subscription to YANG Datastores", RFC 7923,
+              DOI 10.17487/RFC7923, June 2016,
+              <https://www.rfc-editor.org/info/rfc7923>.
 
    [RFC7950]  Bjorklund, M., Ed., "The YANG 1.1 Data Modeling Language",
               RFC 7950, DOI 10.17487/RFC7950, August 2016,
@@ -3681,6 +3695,13 @@ Appendix A.  Changes between revisions
 
    o  reference numbers placed into state machine figures
 
+
+
+Voit, et al.            Expires October 21, 2018               [Page 66]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    o  broke configured replay into its own section
 
    o  many tweaks updates based on LC and YANG doctor reviews
@@ -3690,13 +3711,6 @@ Appendix A.  Changes between revisions
    o  new feature for interface originated.
 
    o  dscp removed from the qos feature
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 66]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    o  YANG model updated in a way which collapses groups only used once
       so that they are part of the 'subscriptions' container.
@@ -3737,6 +3751,13 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    v05 - v06
 
+
+
+Voit, et al.            Expires October 21, 2018               [Page 67]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    o  Made changes proposed by Martin, Kent, and others on the list.
       Most significant of these are stream returned to string (with the
       SYSLOG identity removed), intro section on 5277 relationship, an
@@ -3746,13 +3767,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    o  JSON and XML become features.  Also Xpath and subtree filtering
       become features
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 67]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    o  Terminology updates with event records, and refinement of filters
       to just event stream filters.
@@ -3792,6 +3806,14 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    o  Text tweaks.
 
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 68]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    v01 - v02
 
    o  Subscription status moved under receiver.
@@ -3801,14 +3823,6 @@ Internet-Draft          Subscribed Notifications              April 2018
    o  Security considerations updated
 
    o  Intro rewrite, as well as scattered text changes
-
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 68]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    o  Added Appendix A, to help match this to related drafts in progress
 
@@ -3848,6 +3862,14 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    o  Section for replay added.  Replay now cannot be configured.
 
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 69]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    o  Control plane notification renamed to subscription state
       notification
 
@@ -3857,14 +3879,6 @@ Internet-Draft          Subscribed Notifications              April 2018
    o  In yang model: 'info' changed to 'policy'
 
    o  Scattered text clarifications
-
-
-
-
-Voit, et al.            Expires October 21, 2018               [Page 69]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    v00 - v01 of 5277bis
 
@@ -3906,6 +3920,12 @@ Authors' Addresses
    Email: einarnn@cisco.com
 
 
+
+Voit, et al.            Expires October 21, 2018               [Page 70]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    Ambika Prasad Tripathy
    Cisco Systems
 
@@ -3917,7 +3937,47 @@ Authors' Addresses
 
 
 
-Voit, et al.            Expires October 21, 2018               [Page 70]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Voit, et al.            Expires October 21, 2018               [Page 71]
 
 
 
