@@ -1794,13 +1794,13 @@ Voit, et al.            Expires October 21, 2018               [Page 32]
 Internet-Draft          Subscribed Notifications              April 2018
 
 
-   [ note to the RFC Editor - XXXX above to be replaced with the number
-   of this document, and XXXY to be replaced with the number of
+   [ note to the RFC Editor - please replace XXXX within this YANG model
+   with the number of this document, and XXXY with the number of
    [I-D.draft-ietf-rtgwg-ni-model] ]
 
-   [ note to the RFC Editor - please replace the two dates in the YANG
-   module with the date of publication ]
-
+   [ note to the RFC Editor - please replace the two dates within the
+   YANG module with the date of publication ]
+   
 <CODE BEGINS> file "ietf-subscribed-notifications@2018-04-19.yang"
 module ietf-subscribed-notifications {
   yang-version 1.1;
