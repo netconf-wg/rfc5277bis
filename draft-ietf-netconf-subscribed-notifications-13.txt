@@ -3,7 +3,6 @@ PRE-DRAFT:  April 26 2018
 
 
 
-
 NETCONF                                                          E. Voit
 Internet-Draft                                             Cisco Systems
 Intended status: Standards Track                                A. Clemm
@@ -90,16 +89,16 @@ Table of Contents
      3.3.  Subscriptions Container . . . . . . . . . . . . . . . . .  32
    4.  Data Model  . . . . . . . . . . . . . . . . . . . . . . . . .  33
    5.  Considerations  . . . . . . . . . . . . . . . . . . . . . . .  60
-     5.1.  Implementation Considerations . . . . . . . . . . . . . .  60
-     5.2.  IANA Considerations . . . . . . . . . . . . . . . . . . .  60
+     5.1.  IANA Considerations . . . . . . . . . . . . . . . . . . .  60
+     5.2.  Implementation Considerations . . . . . . . . . . . . . .  60
      5.3.  Transport Considerations  . . . . . . . . . . . . . . . .  61
-     5.4.  Security Considerations . . . . . . . . . . . . . . . . .  61
-   6.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  64
-   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  64
-     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  64
+     5.4.  Security Considerations . . . . . . . . . . . . . . . . .  62
+   6.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  65
+   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  65
+     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  65
      7.2.  Informative References  . . . . . . . . . . . . . . . . .  66
-   Appendix A.  Changes between revisions  . . . . . . . . . . . . .  67
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  71
+   Appendix A.  Changes between revisions  . . . . . . . . . . . . .  68
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  72
 
 1.  Introduction
 
@@ -3321,7 +3320,25 @@ Internet-Draft          Subscribed Notifications              April 2018
 
 5.  Considerations
 
-5.1.  Implementation Considerations
+5.1.  IANA Considerations
+
+   This document registers the following namespace URI in the "IETF XML
+   Registry" [RFC3688]:
+
+   URI: urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications
+   Registrant Contact: The IESG.
+   XML: N/A; the requested URI is an XML namespace.
+
+   This document registers the following YANG module in the "YANG Module
+   Names" registry [RFC6020]:
+
+   Name: ietf-subscribed-notifications
+   Namespace: urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications
+   Prefix: sn
+   Reference: draft-ietf-netconf-ietf-subscribed-notifications-11.txt
+   (RFC form)
+
+5.2.  Implementation Considerations
 
    To support deployments including both configured and dynamic
    subscriptions, it is recommended to split subscription identifiers
@@ -3338,6 +3355,14 @@ Internet-Draft          Subscribed Notifications              April 2018
    records into transmittable notification messages, the receiver should
    be suspended with the reason "unsupportable-volume".
 
+
+
+
+Voit, et al.            Expires October 28, 2018               [Page 60]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    For configured subscriptions, operations are against the set of
    receivers using the subscription identifier as a handle for that set.
    But for streaming updates, state change notifications are local to a
@@ -3347,31 +3372,17 @@ Internet-Draft          Subscribed Notifications              April 2018
    correlate results, it is useful to use the subscription identifier
    across the receivers to allow that correlation.
 
-5.2.  IANA Considerations
-
-   This document registers the following namespace URI in the "IETF XML
-   Registry" [RFC3688]:
-
-   URI: urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications
-   Registrant Contact: The IESG.
-   XML: N/A; the requested URI is an XML namespace.
-
-
-
-
-Voit, et al.            Expires October 28, 2018               [Page 60]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
-   This document registers the following YANG module in the "YANG Module
-   Names" registry [RFC6020]:
-
-   Name: ietf-subscribed-notifications
-   Namespace: urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications
-   Prefix: sn
-   Reference: draft-ietf-netconf-ietf-subscribed-notifications-11.txt
-   (RFC form)
+   For configured replay subscriptions, the receiver is protected from
+   duplicated events being pushed after a publisher is rebooted.
+   However it is possible that a receiver might want to acquire event
+   records which failed to be delivered just prior to the reboot.
+   Delivering these event records be accomplished by leveraging the
+   "eventTime" from the last event record received prior to the receipt
+   of a "subscription-started" state change notification.  With this
+   "eventTime" and the "replay-start-time" from the "subscription-
+   started" notification, an independent dynamic subscription can be
+   established which retrieves any event records which may have been
+   generated but not sent to the receiver.
 
 5.3.  Transport Considerations
 
@@ -3400,6 +3411,14 @@ Internet-Draft          Subscribed Notifications              April 2018
    requirements with NETCONF transport, see
    [I-D.draft-ietf-netconf-netconf-event-notifications].
 
+
+
+
+Voit, et al.            Expires October 28, 2018               [Page 61]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
 5.4.  Security Considerations
 
    The YANG module specified in this document defines a schema for data
@@ -3412,14 +3431,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    The NETCONF Access Control Model (NACM) [RFC8341] provides the means
    to restrict access for particular NETCONF or RESTCONF users to a
-
-
-
-Voit, et al.            Expires October 28, 2018               [Page 61]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
    preconfigured subset of all available NETCONF or RESTCONF operations
    and content.
 
@@ -3456,6 +3467,14 @@ Internet-Draft          Subscribed Notifications              April 2018
    o  "identifier": can overwrite an existing subscription, perhaps one
       configured by another entity.
 
+
+
+
+Voit, et al.            Expires October 28, 2018               [Page 62]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    o  "replay-start-time": can be used to push very large logs, wasting
       resources.
 
@@ -3467,14 +3486,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    o  "source-vrf": can place a subscription into a virtual network
       where receivers are not entitled to view the subscribed content.
-
-
-
-
-Voit, et al.            Expires October 28, 2018               [Page 62]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    o  "stop-time": could be used to terminate content at an inopportune
       time.
@@ -3511,6 +3522,15 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    Container: "/subscriptions"
 
+
+
+
+
+Voit, et al.            Expires October 28, 2018               [Page 63]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    o  "excluded-notifications": leaf can provide information about
       filtered event records.  A network operator should have
       permissions to know about such filtering.
@@ -3523,14 +3543,6 @@ Internet-Draft          Subscribed Notifications              April 2018
    sensitive or vulnerable in some network environments.  It is thus
    important to control access to these operations.  These are the
    operations and their sensitivity/vulnerability:
-
-
-
-
-Voit, et al.            Expires October 28, 2018               [Page 63]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    RPC: all
 
@@ -3563,6 +3575,18 @@ Internet-Draft          Subscribed Notifications              April 2018
       reason, publishers MUST ensure that they have sufficient resources
       to fulfill this request or otherwise reject the request.
 
+
+
+
+
+
+
+
+Voit, et al.            Expires October 28, 2018               [Page 64]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
 6.  Acknowledgments
 
    For their valuable comments, discussions, and feedback, we wish to
@@ -3578,15 +3602,6 @@ Internet-Draft          Subscribed Notifications              April 2018
               Berger, L., Hopps, C., and A. Lindem, "YANG Network
               Instances", draft-ietf-rtgwg-ni-model-11 (work in
               progress), March 2018.
-
-
-
-
-
-Voit, et al.            Expires October 28, 2018               [Page 64]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -3617,6 +3632,17 @@ Internet-Draft          Subscribed Notifications              April 2018
               DOI 10.17487/RFC6020, October 2010,
               <https://www.rfc-editor.org/info/rfc6020>.
 
+
+
+
+
+
+
+Voit, et al.            Expires October 28, 2018               [Page 65]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    [RFC6241]  Enns, R., Ed., Bjorklund, M., Ed., Schoenwaelder, J., Ed.,
               and A. Bierman, Ed., "Network Configuration Protocol
               (NETCONF)", RFC 6241, DOI 10.17487/RFC6241, June 2011,
@@ -3633,16 +3659,6 @@ Internet-Draft          Subscribed Notifications              April 2018
    [RFC7951]  Lhotka, L., "JSON Encoding of Data Modeled with YANG",
               RFC 7951, DOI 10.17487/RFC7951, August 2016,
               <https://www.rfc-editor.org/info/rfc7951>.
-
-
-
-
-
-
-Voit, et al.            Expires October 28, 2018               [Page 65]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    [RFC8040]  Bierman, A., Bjorklund, M., and K. Watsen, "RESTCONF
               Protocol", RFC 8040, DOI 10.17487/RFC8040, January 2017,
@@ -3672,6 +3688,17 @@ Internet-Draft          Subscribed Notifications              April 2018
 
 7.2.  Informative References
 
+
+
+
+
+
+
+Voit, et al.            Expires October 28, 2018               [Page 66]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    [I-D.draft-ietf-netconf-netconf-event-notifications]
               Clemm, Alexander., Voit, Eric., Gonzalez Prieto, Alberto.,
               Nilsen-Nygaard, E., Tripathy, A., Chisholm, S., and H.
@@ -3692,13 +3719,6 @@ Internet-Draft          Subscribed Notifications              April 2018
               Lengyel, "YANG Datastore Subscription", December 2017,
               <https://datatracker.ietf.org/doc/
               draft-ietf-netconf-yang-push/>.
-
-
-
-Voit, et al.            Expires October 28, 2018               [Page 66]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    [I-D.ietf-netmod-yang-tree-diagrams]
               Bjorklund, M. and L. Berger, "YANG Tree Diagrams", draft-
@@ -3722,6 +3742,18 @@ Internet-Draft          Subscribed Notifications              April 2018
    [RFC8071]  Watsen, K., "NETCONF Call Home and RESTCONF Call Home",
               RFC 8071, DOI 10.17487/RFC8071, February 2017,
               <https://www.rfc-editor.org/info/rfc8071>.
+
+
+
+
+
+
+
+
+Voit, et al.            Expires October 28, 2018               [Page 67]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
 
 Appendix A.  Changes between revisions
 
@@ -3748,14 +3780,6 @@ Appendix A.  Changes between revisions
 
    o  security considerations updated based on YANG template.
 
-
-
-
-Voit, et al.            Expires October 28, 2018               [Page 67]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
    o  dependency QoS made non-normative on HTTP2 QoS
 
    o  tree diagrams referenced for each figure using them
@@ -3779,6 +3803,13 @@ Internet-Draft          Subscribed Notifications              April 2018
       them.
 
    v09 - v10
+
+
+
+Voit, et al.            Expires October 28, 2018               [Page 68]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
 
    o  Typos and tweaks
 
@@ -3805,13 +3836,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    o  QoS section moved in from yang-push
 
-
-
-Voit, et al.            Expires October 28, 2018               [Page 68]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
    v06 - v07
 
    o  Clarification on state machine for configured subscriptions.
@@ -3836,6 +3860,13 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    o  Namespaces in examples fixed.
 
+
+
+Voit, et al.            Expires October 28, 2018               [Page 69]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    v04 - v05
 
    o  Returned to the explicit filter subtyping of v00
@@ -3859,14 +3890,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    o  RPCs and Notification support is identified by the Notification
       2.0 capability.
-
-
-
-
-Voit, et al.            Expires October 28, 2018               [Page 69]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    o  Updates to filtering identities and text
 
@@ -3893,6 +3916,13 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    o  HTTP2 moved in from YANG-Push as a transport option
 
+
+
+Voit, et al.            Expires October 28, 2018               [Page 70]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    o  Replay made an optional feature for events.  Won't apply to
       datastores
 
@@ -3915,14 +3945,6 @@ Internet-Draft          Subscribed Notifications              April 2018
    o  Simplified yang model structure for removal of 'basic' grouping.
 
    o  Added a grouping for items which cannot be statically configured.
-
-
-
-
-Voit, et al.            Expires October 28, 2018               [Page 70]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    o  Operational counters per receiver.
 
@@ -3950,6 +3972,13 @@ Internet-Draft          Subscribed Notifications              April 2018
       client to subscriber as applicable.  Updated the definitions to
       include and expand on RFC 5277.
 
+
+
+Voit, et al.            Expires October 28, 2018               [Page 71]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    o  Removal of redundancy with other drafts
 
    o  Many other clean-ups of wording and terminology
@@ -3974,12 +4003,6 @@ Authors' Addresses
    Email: agonzalezpri@vmware.com
 
 
-
-Voit, et al.            Expires October 28, 2018               [Page 71]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
-
    Einar Nilsen-Nygaard
    Cisco Systems
 
@@ -3990,30 +4013,6 @@ Internet-Draft          Subscribed Notifications              April 2018
    Cisco Systems
 
    Email: ambtripa@cisco.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
