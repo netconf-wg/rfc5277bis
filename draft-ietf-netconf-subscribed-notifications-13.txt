@@ -1,6 +1,5 @@
-PRE-DRAFT:  April 26 2018
-*************************
-
+PRE-DRAFT    9-May-2018
+***********************
 
 
 NETCONF                                                          E. Voit
@@ -1096,25 +1095,25 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    When a configured subscription first moves to the VALID state, the
    "state" leaf of each receiver is initialized to "CONNECTING".  If
-   transport connectivity is not available to any receiver, a transport
-   session is established (e.g., through [RFC8071]).  Individual
-   receivers are moved to the ACTIVE state when a "subscription-started"
-   state change notification is successfully passed to that receiver
-   (a).  Event records are only sent to ACTIVE receivers.  Configured
-   receivers remain ACTIVE if both transport connectivity can be
-   verified to the receiver, and event records are not being dropped due
-   to a publisher buffer overflow.  The result is that a receiver will
-   remain ACTIVE on the publisher as long as events aren't being lost,
-   or the receiver cannot be reached.  In addition, a configured
-   subscription's receiver MUST be moved to CONNECTING if transport
-   connectivity cannot be achieved, or if the receiver is reset via the
-   "reset" action (b), (c).  For more on reset, see Section 2.5.5.
+   transport connectivity is not available to any receiver and there are
+   any notification messages to deliver, a transport session is
+   established (e.g., through [RFC8071]).  Individual receivers are
+   moved to the ACTIVE state when a "subscription-started" state change
+   notification is successfully passed to that receiver (a).  Event
+   records are only sent to ACTIVE receivers.  Configured receivers
+   remain ACTIVE if both transport connectivity can be verified to the
+   receiver, and event records are not being dropped due to a publisher
+   buffer overflow.  The result is that a receiver will remain ACTIVE on
+   the publisher as long as events aren't being lost, or the receiver
+   cannot be reached.  In addition, a configured subscription's receiver
+   MUST be moved to CONNECTING if transport connectivity cannot be
+   achieved, or if the receiver is reset via the "reset" action (b),
+   (c).  For more on reset, see Section 2.5.5.
 
    A configured subscription's receiver MUST be moved to the SUSPENDED
    state if there is transport connectivity between the publisher and
    receiver, but notification messages are failing to be delivered due
    to publisher buffer overflow, or notification messages are not able
-   to be generated for that receiver due to insufficient CPU (d).  This
 
 
 
@@ -1123,6 +1122,7 @@ Voit, et al.            Expires October 28, 2018               [Page 20]
 Internet-Draft          Subscribed Notifications              April 2018
 
 
+   to be generated for that receiver due to insufficient CPU (d).  This
    is indicated to the receiver by the "subscription-suspended" state
    change notification.
 
@@ -1169,7 +1169,6 @@ Internet-Draft          Subscribed Notifications              April 2018
    call-home operations will be used to establish the connection.  When
    transport connectivity is available, notification messages may then
    be pushed.
-
 
 
 
@@ -3386,9 +3385,12 @@ Internet-Draft          Subscribed Notifications              April 2018
 
 5.3.  Transport Considerations
 
+   This section provides requirements which must be supportable via any
+   transport technology supporting this solution.
+
    For both configured and dynamic subscriptions the publisher MUST
-   authenticate and authorize a receiver via some transport level
-   mechanism before sending any updates.
+   authenticate a receiver via some transport level mechanism before
+   sending any event records for which they are authorized to see.
 
    A secure transport is highly recommended and the publisher MUST
    ensure that the receiver has sufficient authorization to perform the
@@ -3408,9 +3410,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    Additional transport requirements will be dictated by the choice of
    transport used with a subscription.  For an example of such
-   requirements with NETCONF transport, see
-   [I-D.draft-ietf-netconf-netconf-event-notifications].
-
 
 
 
@@ -3418,6 +3417,9 @@ Voit, et al.            Expires October 28, 2018               [Page 61]
 
 Internet-Draft          Subscribed Notifications              April 2018
 
+
+   requirements with NETCONF transport, see
+   [I-D.draft-ietf-netconf-netconf-event-notifications].
 
 5.4.  Security Considerations
 
@@ -3433,6 +3435,13 @@ Internet-Draft          Subscribed Notifications              April 2018
    to restrict access for particular NETCONF or RESTCONF users to a
    preconfigured subset of all available NETCONF or RESTCONF operations
    and content.
+
+   When a configured receiver gets a new "subscription-started" message
+   for a known subscription where it is already consuming events, the
+   receiver SHOULD retrieve any event records generated since the last
+   event record was received.  This can be accomplish by establishing a
+   separate dynamic replay subscription with the same filtering criteria
+   with the publisher.
 
    There are a number of data nodes defined in this YANG module that are
    writable/creatable/deletable (i.e., config true, which is the
@@ -3458,6 +3467,13 @@ Internet-Draft          Subscribed Notifications              April 2018
    o  "address": can be used to attempt to send traffic to an unwilling
       receiver.
 
+
+
+Voit, et al.            Expires October 28, 2018               [Page 62]
+
+Internet-Draft          Subscribed Notifications              April 2018
+
+
    o  "dependency": can be used to force important traffic to be queued
       behind less important updates.
 
@@ -3466,14 +3482,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    o  "identifier": can overwrite an existing subscription, perhaps one
       configured by another entity.
-
-
-
-
-Voit, et al.            Expires October 28, 2018               [Page 62]
-
-Internet-Draft          Subscribed Notifications              April 2018
-
 
    o  "replay-start-time": can be used to push very large logs, wasting
       resources.
@@ -3513,15 +3521,6 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    Container: "/streams"
 
-   o  "name": if access control is not properly configured, can expose
-      system internals to those who should have no access to this
-      information.
-
-   o  "replay-support": if access control is not properly configured,
-      can expose logs to those who should have no access.
-
-   Container: "/subscriptions"
-
 
 
 
@@ -3530,6 +3529,15 @@ Voit, et al.            Expires October 28, 2018               [Page 63]
 
 Internet-Draft          Subscribed Notifications              April 2018
 
+
+   o  "name": if access control is not properly configured, can expose
+      system internals to those who should have no access to this
+      information.
+
+   o  "replay-support": if access control is not properly configured,
+      can expose logs to those who should have no access.
+
+   Container: "/subscriptions"
 
    o  "excluded-notifications": leaf can provide information about
       filtered event records.  A network operator should have
@@ -3571,21 +3579,16 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    RPC: "modify-subscription"
 
-   o  Subscriptions could overload a publisher's resources.  For this
-      reason, publishers MUST ensure that they have sufficient resources
-      to fulfill this request or otherwise reject the request.
-
-
-
-
-
-
 
 
 Voit, et al.            Expires October 28, 2018               [Page 64]
 
 Internet-Draft          Subscribed Notifications              April 2018
 
+
+   o  Subscriptions could overload a publisher's resources.  For this
+      reason, publishers MUST ensure that they have sufficient resources
+      to fulfill this request or otherwise reject the request.
 
 6.  Acknowledgments
 
@@ -3631,10 +3634,6 @@ Internet-Draft          Subscribed Notifications              April 2018
               the Network Configuration Protocol (NETCONF)", RFC 6020,
               DOI 10.17487/RFC6020, October 2010,
               <https://www.rfc-editor.org/info/rfc6020>.
-
-
-
-
 
 
 
@@ -3701,22 +3700,22 @@ Internet-Draft          Subscribed Notifications              April 2018
 
    [I-D.draft-ietf-netconf-netconf-event-notifications]
               Clemm, Alexander., Voit, Eric., Gonzalez Prieto, Alberto.,
-              Nilsen-Nygaard, E., Tripathy, A., Chisholm, S., and H.
-              Trevino, "NETCONF support for event notifications",
-              October 2017, <https://datatracker.ietf.org/doc/
+              Nilsen-Nygaard, E., and A. Tripathy, "NETCONF support for
+              event notifications", May 2018,
+              <https://datatracker.ietf.org/doc/
               draft-ietf-netconf-netconf-event-notifications/>.
 
    [I-D.draft-ietf-netconf-restconf-notif]
               Voit, Eric., Clemm, Alexander., Tripathy, A., Nilsen-
               Nygaard, E., and Alberto. Gonzalez Prieto, "Restconf and
-              HTTP transport for event notifications", January 2018,
+              HTTP transport for event notifications", May 2018,
               <https://datatracker.ietf.org/doc/
               draft-ietf-netconf-restconf-notif/>.
 
    [I-D.ietf-netconf-yang-push]
               Clemm, Alexander., Voit, Eric., Gonzalez Prieto, Alberto.,
               Tripathy, A., Nilsen-Nygaard, E., Bierman, A., and B.
-              Lengyel, "YANG Datastore Subscription", December 2017,
+              Lengyel, "YANG Datastore Subscription", May 2018,
               <https://datatracker.ietf.org/doc/
               draft-ietf-netconf-yang-push/>.
 
@@ -4031,8 +4030,3 @@ Authors' Addresses
 
 
 Voit, et al.            Expires October 28, 2018               [Page 72]
-
-
-
-
-
