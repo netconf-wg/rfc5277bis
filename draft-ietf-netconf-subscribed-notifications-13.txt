@@ -1828,8 +1828,8 @@ Internet-Draft          Subscribed Notifications               June 2018
                +--rw receiver* [name]
                   +--rw name                      string
                   +--rw address?                  inet:host
-                  +--ro count-sent?     yang:counter64
-                  +--ro count-excluded?   yang:counter64
+                  +--ro count-sent?               yang:counter64
+                  +--ro count-excluded?           yang:counter64
                   +--ro state                     enumeration
                   +---x reset {configured}?
                      +--ro output
