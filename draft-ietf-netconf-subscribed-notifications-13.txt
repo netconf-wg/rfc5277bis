@@ -2562,9 +2562,12 @@ Internet-Draft          Subscribed Notifications               June 2018
                                           "sn:configurable-encoding")';
       type encoding;
       description
-        "The type of encoding for the subscribed data.   If not
-        included, the encoding used will be the default for one
-        encoding expected with a transport.";
+        "The type of encoding for notification messages.   For a 
+        dynamic subscription, if not included as part of an establish-
+        subscription RPC, the encoding will be populated with the 
+        encoding used by that RPC.  For a configured subscription, if 
+        not explicitly configured the encoding with be the default 
+        encoding for an underlying transport.";
     }
     leaf purpose {
       if-feature "configured";
