@@ -871,9 +871,10 @@ Internet-Draft          Subscribed Notifications               June 2018
 
     establish-subscription         modify-subscription
     ----------------------         -------------------
-    dscp-unavailable               filter-unsupported
-    filter-unsupported             insufficient-resources
-    history-unavailable            no-such-subscription
+    dscp-unavailable               filter-unsupported      
+    encoding-unsupported           insufficient-resources
+    filter-unsupported             no-such-subscription
+    history-unavailable            
     insufficient-resources
     replay-unsupported
 
