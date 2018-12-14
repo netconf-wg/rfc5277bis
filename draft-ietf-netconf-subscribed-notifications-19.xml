@@ -51,7 +51,7 @@
         </address>
     </author>
 
-    <date day="13" month="December" year="2018"/>
+    <date day="14" month="December" year="2018"/>
 
     <area>Operations &amp; Management</area>
 
@@ -374,7 +374,7 @@
           </section>
             
           <section title="Deleting a Dynamic Subscription">
-            <t>The "delete-subscription" operation permits canceling an existing subscription. If the publisher accepts the request, and the publisher has indicated success, the publisher MUST NOT send any more notification messages for this subscription. If the delete request matches a known subscription established on the same transport session, then it MUST be deleted; otherwise it MUST be rejected with no changes to the publisher.</t>
+            <t>The "delete-subscription" operation permits canceling an existing subscription. If the publisher accepts the request, and the publisher has indicated success, the publisher MUST NOT send any more notification messages for this subscription.</t>
             
             <t>Below is a tree diagram for "delete-subscription". All objects contained in this tree are described within the included YANG model within <xref target="data_model"/>.</t>
                 
@@ -996,7 +996,7 @@ dashed boxes: states for a subscription
    
         <figure>
           <artwork align="left" name="ietf-subscribed-notifications@2018-10-11.yang"><![CDATA[
-<CODE BEGINS> file "ietf-subscribed-notifications@2018-10-11.yang"
+<CODE BEGINS> file "ietf-subscribed-notifications@2018-10-25.yang"
 module ietf-subscribed-notifications {
   yang-version 1.1;
   namespace 
@@ -1071,7 +1071,7 @@ module ietf-subscribed-notifications {
     This version of this YANG module is part of RFC XXXX; see the RFC 
     itself for full legal notices.";
   
-  revision 2018-10-11 {
+  revision 2018-10-25 {
     description
       "Initial version";
     reference 
@@ -1413,8 +1413,18 @@ module ietf-subscribed-notifications {
 
            The expression is evaluated in the following XPath context:
 
-             o   The set of namespace declarations are those in scope on
-                 the 'stream-xpath-filter' leaf element.
+             o   The set of namespace declarations is the set of prefix
+                 and namespace pairs for all YANG modules implemented
+                 by the server, where the prefix is the YANG module
+                 name and the namespace is as defined by the
+                 "namespace" statement in the YANG module.
+
+                 If the leaf is encoded in XML, all namespace
+                 declarations in scope on the 'stream-xpath-filter'
+                 leaf element are added to the set of namespace
+                 declarations.  If a prefix found in the XML is
+                 already present in the set of namespace declarations,
+                 the namespace in the XML is used.
 
              o  The set of variable bindings is empty.
 
@@ -2598,13 +2608,15 @@ module example-foo-subscribed-notifications {
     <section title="Changes between revisions">
       <t>(To be removed by RFC editor prior to publication)</t>
 
-       <t>v18 - v19
+        <t>v18 - v19
         <list style="symbols">
+          <t>XPath-stream-filter YANG object definition.</t>
           <t>Per Kent's request, added name attribute to artwork which need to be extracted.</t>
         </list>
-        </t>
-        
-       <t>v17 - v18
+        </t>      
+      
+      
+        <t>v17 - v18
         <list style="symbols">
           <t>Transport optional in YANG model.</t>
           <t>Modify subscription must come from the originator of the subscription. (Text got dropped somewhere previously.)</t>
