@@ -51,7 +51,7 @@
         </address>
     </author>
 
-    <date day="14" month="December" year="2018"/>
+    <date day="18" month="December" year="2018"/>
 
     <area>Operations &amp; Management</area>
 
@@ -620,7 +620,7 @@ dashed boxes: states for a subscription
           <t>The following example within <xref target="RFC7950"/> section 7.16.3 is an example of a compliant message:</t>
                
           <figure align="center" anchor="simple-data-plane-notif" title="subscribed notification message">       
-            <artwork align="left" name="ex-simple-notif.xml"><![CDATA[
+            <artwork align="left"><![CDATA[
    <notification
           xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
        <eventTime>2007-09-01T10:00:00Z</eventTime>
@@ -995,7 +995,7 @@ dashed boxes: states for a subscription
             <t>[ note to the RFC Editor - please replace the two dates within the YANG module with the date of publication ]</t>
    
         <figure>
-          <artwork align="left" name="ietf-subscribed-notifications@2018-10-11.yang"><![CDATA[
+         <artwork align="left" name="ietf-subscribed-notifications@2018-10-25.yang"><![CDATA[
 <CODE BEGINS> file "ietf-subscribed-notifications@2018-10-25.yang"
 module ietf-subscribed-notifications {
   yang-version 1.1;
@@ -2610,8 +2610,7 @@ module example-foo-subscribed-notifications {
 
         <t>v18 - v19
         <list style="symbols">
-          <t>XPath-stream-filter YANG object definition.</t>
-          <t>Per Kent's request, added name attribute to artwork which need to be extracted.</t>
+          <t>XPath-stream-filter YANG object definition updated based on NETMOD discussions.</t>
         </list>
         </t>      
       
